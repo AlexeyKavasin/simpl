@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>simpl</title>
+  <link rel="stylesheet" href="css/main.min.css">
+</head>
+<body>
+  <header>
+      <div class="container header-container">
+        <h1 class="main-heading">simpl</h1>
+        <div class="countdown-block" id="countdown"></div>
+      </div>
+    </header>
+    <div class="main">
+
+      <div class="pop-up" id="setexpense-pop-up">
+        <div class="text-block">
+
+          <p>Внесите потраченную сумму</p>
+
+          <div class="etexpense-block setexpense-value-block">
+            <input type="number" class="setexpense-field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>
+          </div>
+
+          <p>Внесите наименование покупки</p>
+
+          <div class="setexpense-block setexpense-name-block">
+            <input type="text" class="setexpense-field" id="setexpense-name-field" value="">
+          </div>
+
+          <div class="pop-up-controls setexpense-controls">
+            <button type="button" class="btn-common" id="setexpense-submit">OK</button>
+            <button type="button" class="btn-common" id="setexpense-cancel">CANCEL</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="pop-up" id="setlimit-pop-up">
+        <div class="text-block">
+
+          <p>Задайте дневной лимит.<br> От 1 до 29999.</p>
+
+          <div class="setlimit-value-block">
+            <input type="number" class="setlimit-field" id="setlimit-field" min="1" max="29999" step="1" autofocus>
+          </div>
+
+          <p>Задайте период.<br> От 1 до 7 (в днях).</p>
+
+          <div class="deadline-range-block">
+            <input type="range" id="deadline-range-field" min="1" max="7" step="1" value="1">
+          </div>
+
+          <div class="deadline-range-results">
+            <p class="deadline-range-output" id="deadline-range-output">1</p>
+          </div>
+
+          <div class="pop-up-controls setlimit-controls">
+            <button type="button" class="btn-common" id="setlimit-submit">OK</button>
+            <button type="button" class="btn-common" id="setlimit-cancel">CANCEL</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="pop-up" id="end-pop-up">
+        <div class="text-block end-text-block">
+          <div id="end-verdict"></div>
+          <div id="end-stat"></div>
+          <div class="pop-up-controls end-controls">
+            <button type="button" class="btn-common" id="end-restart">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pop-up" id="rest-confirm-pop-up">
+        <div class="text-block rest-confirm-text-block">
+          <p>Весь прогресс будет потерян. Продолжить?</p><br>
+          <div class="pop-up-controls rest-confirm-controls">
+            <button type="button" class="btn-common" id="restart-confirm">OK</button>
+            <button type="button" class="btn-common" id="restart-cancel">CANCEL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container main-container">
+        <div class="limit-block">
+          <label for="limit-field"></label>
+          <input type="text" id="limit-field" name="limit-field" placeholder="Здесь будет виден ваш текущий баланс" value="" readonly="true">
+        </div>
+        <div class="controls">
+          <button type= "button" class="init-load-btn btn-common" id="set-limit-btn">Установить период и дневной лимит</button>
+          <button type= "button" class="subseq-load-btn btn-common" id="reset-btn">Начать сначала</button>
+          <button type= "button" class="subseq-load-btn btn-common" id="limit-subtract-btn">Добавить расход</button>
+        </div>
+        <div class="adviser" id="adviser-container">
+          <div id="adviser-content-wrapper"></div>
+        </div>
+      </div>
+
+    </div>
+    <footer>
+      <div class="container footer-container">
+        <p class="additional-info">2016 - ver 0.0.0</p>
+      </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

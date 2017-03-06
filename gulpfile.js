@@ -23,7 +23,6 @@ gulp.task('copy', function() {
     'img/**',
     'css/**',
     'js/**',
-    'specials/**',
     '*.html'
   ], {
     base: '.'
@@ -36,9 +35,7 @@ gulp.task('style', function() {
     .pipe(plumber())
     .pipe(sass())
     .pipe(postcss([
-      autoprefixer({browsers: [
-        'last 2 versions'
-      ]}),
+      autoprefixer(),
       mqpacker({
         sort: true
       })

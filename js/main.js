@@ -334,7 +334,7 @@ function showSystemMessage(systemMessageText, messageType, expandTime) {
       adviserContainer.innerHTML += blinkingCursor;
       adviserContainer.classList.add(messageType);
     }
-  }, 25); // магическое число
+  }, 20); // магическое число
   messageHide = setTimeout(function() {
     if(adviserContainer.classList.contains('error-message-open') || adviserContainer.classList.contains('regular-message-open')) {
       cleanAdviser();

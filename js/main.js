@@ -1,26 +1,20 @@
 'use strict';
 
-// screen.orientation.lock('portrait');
-
 var SEC_IN_DAY = 86400;
 var secInPassedDays = 86400;
 
-var limitSubtractBtn = document.querySelector('#limit-subtract-btn'); // Кнопка списания
-var setLimitBtn = document.querySelector('#set-limit-btn'); // Кнопка установки лимита
+var workingSpace = document.querySelector('#main');
 var limitInputField = document.querySelector('#limit-field'); // Поле с суммой
-var resetBtn = document.querySelector('#reset-btn'); // Кнопка сброса
 var adviserContainer = document.querySelector('#adviser-content-wrapper'); // Поле для вывода сообщений
 var countdownContainer = document.getElementById('countdown'); // Поле с таймером
 var initialBtns = document.querySelectorAll('.init-load-btn');
 var subseqBtns = document.querySelectorAll('.subseq-load-btn');
 
 var initialLimit, currentLimit, expense, endDeadLine, startDeadLine, deadLinePeriod, countdownIsOn, animateAdvise, messageHide;
-var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
 
 // Поп-ап финальный
 
 var endPopUp = document.querySelector('#end-pop-up');
-var endBtn = document.querySelector('#end-restart');
 var endVerdict = document.querySelector('#end-verdict');
 var endStat = document.querySelector('#end-stat');
 
@@ -29,23 +23,17 @@ var endStat = document.querySelector('#end-stat');
 var setLimitPopUp = document.querySelector('#setlimit-pop-up');
 var deadlineRange = document.querySelector('#deadline-range-field');
 var deadlineRangeOutput = document.querySelector('#deadline-range-output');
-var setLimitSubmit = document.querySelector('#setlimit-submit');
-var setLimitCancel = document.querySelector('#setlimit-cancel');
 var setlimitField = document.querySelector('#setlimit-field');
 
 // Поп-ап подтверждение рестарта
 
 var restartConfirmPopUp = document.querySelector('#rest-confirm-pop-up');
-var restartConfirmBtn = document.querySelector('#restart-confirm');
-var restartCancelBtn = document.querySelector('#restart-cancel');
 
 // Поп-ап списание средств
 
 var setExpensePopUp = document.querySelector('#setexpense-pop-up');
 var setExpenseValueField = document.querySelector('#setexpense-value-field');
 var setExpenseNameField = document.querySelector('#setexpense-name-field');
-var setExpenseConfirmBtn = document.querySelector('#setexpense-submit');
-var setExpenseCancelBtn = document.querySelector('#setexpense-cancel');
 
 // Условия при загрузке страницы
 
@@ -65,70 +53,41 @@ window.onload = function() {
   } else {
     initialControlsState();
   }
-
 };
 
 // Обработчики по кликам на кнопки
-// Три основные кнопки
 
-setLimitBtn.addEventListener('click', function() {
-  togglePopUpView(setLimitPopUp);
-});
+workingSpace.addEventListener('click', function(evt) {
+  var id = evt.target.id;
+  var popId = evt.target.dataset.popId;
+  var popup = document.getElementById(popId);
 
-resetBtn.addEventListener('click', function() {
-  togglePopUpView(restartConfirmPopUp);
-});
-
-limitSubtractBtn.addEventListener('click', function() {
-  togglePopUpView(setExpensePopUp);
-});
-
-// Поп-ап финальный
-
-endBtn.addEventListener('click', function() {
-  togglePopUpView(endPopUp);
-  restart();
+  if(id === 'set-limit-btn' || id === 'reset-btn' || id === 'limit-subtract-btn' || id === 'restart-cancel') {
+    togglePopUpView(popup);
+  } else if(id === 'end-restart' || id === 'restart-confirm') {
+    togglePopUpView(popup);
+    restart();
+  } else if(id === 'setlimit-cancel') {
+    togglePopUpView(popup);
+    setlimitField.value = '';
+  } else if(id === 'setexpense-cancel') {
+    togglePopUpView(popup);
+    setExpenseValueField.value = '';
+    setExpenseNameField.value = '';
+  } else if(id === 'setlimit-submit') {
+    setLimitPopUpFill(setLimit);
+    setlimitField.value = '';
+  } else if(id === 'setexpense-submit') {
+    setExpensePopUpFill(limitSubtract);
+    setExpenseValueField.value = '';
+    setExpenseNameField.value = '';
+  }
 });
 
 // Поп-ап установка лимита
 
 deadlineRange.addEventListener('input', function() {
   deadlineRangeOutput.innerHTML = deadlineRange.value;
-});
-
-setLimitSubmit.addEventListener('click', function() {
-  setLimitPopUpFill(setLimit);
-  setlimitField.value = '';
-});
-
-setLimitCancel.addEventListener('click', function() {
-  togglePopUpView(setLimitPopUp);
-  setlimitField.value = '';
-});
-
-// Поп-ап подтверждение рестарта
-
-restartConfirmBtn.addEventListener('click', function() {
-  togglePopUpView(restartConfirmPopUp);
-  restart();
-});
-
-restartCancelBtn.addEventListener('click', function() {
-  togglePopUpView(restartConfirmPopUp);
-});
-
-// Поп-ап подтверждение списания
-
-setExpenseCancelBtn.addEventListener('click', function() {
-  togglePopUpView(setExpensePopUp);
-  setExpenseValueField.value = '';
-  setExpenseNameField.value = '';
-});
-
-setExpenseConfirmBtn.addEventListener('click', function() {
-  setExpensePopUpFill(limitSubtract);
-  setExpenseValueField.value = '';
-  setExpenseNameField.value = '';
 });
 
 // Запуск приложения при перезагрузке / закрытии браузера
@@ -152,14 +111,12 @@ function init() {
 
 function btnsStateToggle(btns, state) {
   for (var i = 0; i < btns.length; i++) {
-    switch(state) {
-      case 'disabled':
-        btns[i].disabled = true;
-        btns[i].classList.add('inactive');
-        break;
-      default:
-        btns[i].disabled = false;
-        btns[i].classList.remove('inactive');
+    if(state === 'disabled') {
+      btns[i].disabled = true;
+      btns[i].classList.add('inactive');
+    } else {
+      btns[i].disabled = false;
+      btns[i].classList.remove('inactive');
     }
   }
 }
@@ -200,7 +157,7 @@ function setLimit() {
 // Проверка правильности введенного значения - лимит
 
 function checkLimit() {
-  return deadLinePeriod && Number.isInteger(deadLinePeriod) && deadLinePeriod >= 1 && deadLinePeriod <= 7
+  return deadLinePeriod && Number.isInteger(deadLinePeriod) && deadLinePeriod >= 1 && deadLinePeriod <= 9
   && initialLimit > 0 && Number.isInteger(initialLimit) && initialLimit < 30000;
 }
 
@@ -221,7 +178,6 @@ function renewLimit(sum) {
 // Списание
 
 function limitSubtract() {
-  //cleanAdviser();
   if(checkExpense()) {
 
     if(localStorage.currentLimit) {
@@ -275,8 +231,8 @@ function restart() {
 function setInitialTimer() {
   startDeadLine = new Date();
   endDeadLine = new Date();
-  localStorage.setItem('startDeadLine', startDeadLine);
   endDeadLine.setDate(startDeadLine.getDate() + deadLinePeriod);
+  localStorage.setItem('startDeadLine', startDeadLine);
   localStorage.setItem('endDeadLine', endDeadLine);
   localStorage.setItem('deadLinePeriod', deadLinePeriod);
   countdownIsOn = true;
@@ -325,8 +281,7 @@ function countdownWork() {
       thour = '0' + thour;
     }
 
-    var timestr = thour + ':' + tmin + ':' + tsec;
-    countdownContainer.innerHTML = timestr;
+    countdownContainer.innerHTML = thour + ':' + tmin + ':' + tsec;
 
     setTimeout(function() {
       countdownWork();
@@ -339,7 +294,7 @@ function countdownWork() {
 
 var systemMessage = {
   expenseErrorTxt: 'Значение некорректно. Допустимая сумма покупки - от 1 до 29999 ',
-  limitErrorTxt: 'Значение некорректно. Допустимый лимит - от 1 до 29999. Допустимый период - от 1 до 7 дней ',
+  limitErrorTxt: 'Значение некорректно. Допустимый лимит - от 1 до 29999. Допустимый период - от 1 до 9 дней ',
   messageType: ['error-message-open', 'regular-message-open']
 };
 
@@ -370,6 +325,7 @@ function addExpenseItem(expenseItem) {
 
 function showSystemMessage(systemMessageText, messageType, expandTime) {
   var i = 0;
+  var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
   animateAdvise = setInterval(function() {
     adviserContainer.innerHTML += systemMessageText[i];
     i++;
@@ -468,20 +424,6 @@ function setColorIndicator() {
   }
 }
 
-// BUGS / ERRORS
+// FIXES
 
-// 1) В конце при определенных условиях (длительный период бездействия, загрузка страница когда цикл уже закончен) - done
-
-// FEATURES
-
-// 1) Список трат с описанием. Небольшой блок - максимум описание трех покупок. Каждая последующая встает в начало списка,
-// самое нижнее при этом удаляется. (массив?)
-// 2) Оставить только портретную ориентацию для мобильных устройств.
-
-
-// Механизм добавления/удаления объекта из массива - done
-// Дорабокта поп-апа - значение из инпута попадает в список - done
-// Сохранение в локал сторож и подгрузка из него при открытии страницы
-// При рестарте все сбрасывается
-//
-//
+// 1. Оптимизация событий (делегирование)

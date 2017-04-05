@@ -1,3 +1,14 @@
+// Animations
+
+@keyframes blink-animation {
+  0%, 100%{
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /*Input type range styling*/
 
 .deadline-range-block input[type=range] {
@@ -114,4 +125,10 @@
 .setexpense-field::-webkit-outer-spin-button,
 .setlimit-field::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+// Misc
+
+.negative-balance {
+  box-shadow: inset -1px -3px 0 -1px #ff3c3c;
 }

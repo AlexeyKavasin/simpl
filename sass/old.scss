@@ -30,7 +30,7 @@ body {
   min-height: 65px;
   padding: 10px;
   border: 1px solid #020604;
-  font-size: 0.85em;
+  font-size: 0.9em;
   background: #fff;
   cursor: pointer;
   outline: none;
@@ -80,7 +80,7 @@ body {
 .limit-block input[type="text"] {
   width: 100%;
   min-height: 50px;
-  font-size: 0.85em;
+  font-size: 0.9em;
   text-align: center;
   border: none;
 }
@@ -97,23 +97,11 @@ body {
 .controls .inactive {
   opacity: .3;
 }
-.negative-balance {
-  box-shadow: inset -1px -3px 0 -1px #ff3c3c;
-}
-
-@keyframes blink-animation {
-  0%, 100%{
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}
 
 .adviser {
   width: 100%;
   margin: 0 auto;
-  font-size: 0.85em;
+  font-size: 0.9em;
   text-align: left;
 }
 

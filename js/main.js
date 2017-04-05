@@ -7,16 +7,12 @@ var workingSpace = document.querySelector('#main');
 var limitInputField = document.querySelector('#limit-field'); // Поле с суммой
 var adviserContainer = document.querySelector('#adviser-content-wrapper'); // Поле для вывода сообщений
 var countdownContainer = document.getElementById('countdown'); // Поле с таймером
-var initialBtns = document.querySelectorAll('.init-load-btn');
-var subseqBtns = document.querySelectorAll('.subseq-load-btn');
-
-var initialLimit, currentLimit, expense, endDeadLine, startDeadLine, deadLinePeriod, countdownIsOn, animateAdvise, messageHide;
+var initialLimit, currentLimit, expense, endDeadLine, startDeadLine, deadLinePeriod, animateAdvise, messageHide;
+var countdownIsOn = countdownIsOn || false;
 
 // Поп-ап финальный
 
 var endPopUp = document.querySelector('#end-pop-up');
-var endVerdict = document.querySelector('#end-verdict');
-var endStat = document.querySelector('#end-stat');
 
 // Поп-ап установка лимита
 
@@ -51,54 +47,19 @@ window.onload = function() {
     initialLimit = localStorage.initialLimit;
     limitInputField.value = initialLimit;
   } else {
-    initialControlsState();
+    controlsState();
   }
 };
 
-// Обработчики по кликам на кнопки
-
-workingSpace.addEventListener('click', function(evt) {
-  var id = evt.target.id;
-  var popId = evt.target.dataset.popId;
-  var popup = document.getElementById(popId);
-
-  if(id === 'set-limit-btn' || id === 'reset-btn' || id === 'limit-subtract-btn' || id === 'restart-cancel') {
-    togglePopUpView(popup);
-  } else if(id === 'end-restart' || id === 'restart-confirm') {
-    togglePopUpView(popup);
-    restart();
-  } else if(id === 'setlimit-cancel') {
-    togglePopUpView(popup);
-    setlimitField.value = '';
-  } else if(id === 'setexpense-cancel') {
-    togglePopUpView(popup);
-    setExpenseValueField.value = '';
-    setExpenseNameField.value = '';
-  } else if(id === 'setlimit-submit') {
-    setLimitPopUpFill(setLimit);
-    setlimitField.value = '';
-  } else if(id === 'setexpense-submit') {
-    setExpensePopUpFill(limitSubtract);
-    setExpenseValueField.value = '';
-    setExpenseNameField.value = '';
-  }
-});
-
-// Поп-ап установка лимита
-
-deadlineRange.addEventListener('input', function() {
-  deadlineRangeOutput.innerHTML = deadlineRange.value;
-});
-
-// Запуск приложения при перезагрузке / закрытии браузера
+// Запуск приложения при повтороной загрузке
 
 function init() {
-  inProcessControlsState();
   startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
   endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
   deadLinePeriod = localStorage.deadLinePeriod;
   secInPassedDays = localStorage.secInPassedDays;
   countdownIsOn = true;
+  controlsState();
   setColorIndicator();
   countdownWork();
   clearTimeout(showTimer);
@@ -107,30 +68,33 @@ function init() {
   }, 1000);
 }
 
-// Активация / деактивация кнопок
+// Переключение состояния кнопок
 
-function btnsStateToggle(btns, state) {
-  for (var i = 0; i < btns.length; i++) {
-    if(state === 'disabled') {
-      btns[i].disabled = true;
-      btns[i].classList.add('inactive');
-    } else {
-      btns[i].disabled = false;
-      btns[i].classList.remove('inactive');
-    }
+function controlsState() {
+  var initialBtns = document.querySelectorAll('.init-load-btn');
+  var inProcessBtns = document.querySelectorAll('.in-process-btn');
+
+  if(!countdownIsOn) {
+    initialBtns.forEach(function(btn) {
+      btn.disabled = false;
+      btn.classList.remove('inactive');
+    });
+    inProcessBtns.forEach(function(btn) {
+      btn.disabled = true;
+      btn.classList.add('inactive');
+    });
+    limitInputField.style.fontSize = '0.9em';
+  } else {
+    inProcessBtns.forEach(function(btn) {
+      btn.disabled = false;
+      btn.classList.remove('inactive');
+    });
+    initialBtns.forEach(function(btn) {
+      btn.disabled = true;
+      btn.classList.add('inactive');
+    });
+    limitInputField.style.fontSize = '1.25em';
   }
-}
-
-function initialControlsState() {
-  btnsStateToggle(initialBtns, 'enabled');
-  btnsStateToggle(subseqBtns, 'disabled');
-  limitInputField.style.fontSize = '0.85em';
-}
-
-function inProcessControlsState() {
-  btnsStateToggle(initialBtns, 'disabled');
-  btnsStateToggle(subseqBtns, 'enabled');
-  limitInputField.style.fontSize = '1.25em';
 }
 
 // Первоначальная установка лимита
@@ -138,7 +102,6 @@ function inProcessControlsState() {
 function setLimit() {
   cleanAdviser();
   if(checkLimit()) {
-    inProcessControlsState();
     limitInputField.value = initialLimit;
     localStorage.setItem('initialLimit', initialLimit);
     localStorage.setItem('secInPassedDays', secInPassedDays);
@@ -147,6 +110,7 @@ function setLimit() {
       countdownWork();
       countdownContainer.style.display = 'block';
     }, 1000);
+    controlsState();
     return initialLimit;
   } else {
     showSystemMessage(systemMessage.limitErrorTxt, systemMessage.messageType[0], 10000);
@@ -164,11 +128,7 @@ function checkLimit() {
 // Обновление текущего лимита раз в сутки
 
 function renewLimit(sum) {
-  if(parseInt(localStorage.currentLimit, 10)) {
-    currentLimit = parseInt(localStorage.currentLimit, 10);
-  } else if(parseInt(localStorage.initialLimit, 10)) {
-    currentLimit = parseInt(localStorage.initialLimit, 10);
-  }
+  currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
   currentLimit += sum;
   limitInputField.value = currentLimit;
   localStorage.setItem('currentLimit', currentLimit);
@@ -179,13 +139,7 @@ function renewLimit(sum) {
 
 function limitSubtract() {
   if(checkExpense()) {
-
-    if(localStorage.currentLimit) {
-      currentLimit = localStorage.currentLimit;
-    } else {
-      currentLimit = initialLimit;
-    }
-
+    currentLimit = localStorage.currentLimit || initialLimit;
     currentLimit -= expense;
     localStorage.setItem('currentLimit', currentLimit);
     limitInputField.value = currentLimit;
@@ -214,8 +168,8 @@ function checkExpense() {
 // Рестарт приложения
 
 function restart() {
-  initialControlsState();
   countdownIsOn = false;
+  controlsState();
   cleanAdviser();
   localStorage.clear();
   initialLimit = currentLimit = limitInputField.value = setlimitField.value = startDeadLine = endDeadLine = deadLinePeriod = '';
@@ -248,7 +202,8 @@ function countdownWork() {
     now = Math.floor((endDeadLine - now) / 1000);
 
     if(now <= 0) {
-      while( parseInt(localStorage.secInPassedDays, 10) < (deadLinePeriod * SEC_IN_DAY) && parseInt(localStorage.currentLimit, 10) + parseInt(localStorage.initialLimit, 10) < parseInt(localStorage.initialLimit, 10) * deadLinePeriod ) {
+      while( parseInt(localStorage.secInPassedDays, 10) < (deadLinePeriod * SEC_IN_DAY) &&
+        parseInt(localStorage.currentLimit, 10) + parseInt(localStorage.initialLimit, 10) < parseInt(localStorage.initialLimit, 10) * deadLinePeriod ) {
         renewLimit(parseInt(localStorage.initialLimit, 10));
         localStorage.setItem('secInPassedDays', secInPassedDays);
       }
@@ -356,6 +311,8 @@ function cleanAdviser() {
 // Вывод и наполнение финального поп-апа
 
 function endPopUpFill() {
+  var endVerdict = document.querySelector('#end-verdict');
+  var endStat = document.querySelector('#end-stat');
   initialLimit = parseInt(localStorage.initialLimit, 10);
   currentLimit = parseInt(localStorage.currentLimit, 10);
   deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
@@ -424,6 +381,41 @@ function setColorIndicator() {
   }
 }
 
+// Обработчики по кликам на кнопки
+
+workingSpace.addEventListener('click', function(evt) {
+  var id = evt.target.id;
+  var popId = evt.target.dataset.popId;
+  var popup = document.getElementById(popId);
+
+  if(id === 'set-limit-btn' || id === 'reset-btn' || id === 'limit-subtract-btn' || id === 'restart-cancel') {
+    togglePopUpView(popup);
+  } else if(id === 'end-restart' || id === 'restart-confirm') {
+    togglePopUpView(popup);
+    restart();
+  } else if(id === 'setlimit-cancel') {
+    togglePopUpView(popup);
+    setlimitField.value = '';
+  } else if(id === 'setexpense-cancel') {
+    togglePopUpView(popup);
+    setExpenseValueField.value = '';
+    setExpenseNameField.value = '';
+  } else if(id === 'setlimit-submit') {
+    setLimitPopUpFill(setLimit);
+    setlimitField.value = '';
+  } else if(id === 'setexpense-submit') {
+    setExpensePopUpFill(limitSubtract);
+    setExpenseValueField.value = '';
+    setExpenseNameField.value = '';
+  }
+});
+
+// Поп-ап установка лимита
+
+deadlineRange.addEventListener('input', function() {
+  deadlineRangeOutput.innerHTML = deadlineRange.value;
+});
+
 // FIXES
 
-// 1. Оптимизация событий (делегирование)
+// 1. Максимально спрятать глобальные переменные

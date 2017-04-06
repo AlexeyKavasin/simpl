@@ -1,5 +1,113 @@
 'use strict';
 
+var simpl = {
+  // первоначальная установка лимита
+  setLimit: function() {
+    this.cleanAdviser();
+    if(deadLinePeriod < 1 || deadLinePeriod > 9 || initialLimit < 0 || isNaN(initialLimit) || initialLimit > 30000) {
+      showSystemMessage(systemMessage.limitErrorTxt, systemMessage.messageType[0], 10000);
+      return 'Значение некорректно';
+    }
+    limitInputField.value = initialLimit;
+    localStorage.setItem('initialLimit', initialLimit);
+    localStorage.setItem('secInPassedDays', secInPassedDays);
+    setInitialTimer();
+    setTimeout(function() {
+      countdownWork();
+      countdownContainer.style.display = 'block';
+    }, 1000);
+    this.controlsState();
+    return initialLimit;
+  },
+  // первоначальные значения для установки лимита
+  setLimitPopUpFill: function() {
+    initialLimit = parseInt(setlimitField.value, 10);
+    deadLinePeriod = parseInt(deadlineRange.value, 10);
+    this.togglePopUpView(setLimitPopUp);
+    this.setLimit();
+  },
+  // индикатор отрицательного баланса
+  checkColorIndicator: function() {
+    if(parseInt(localStorage.currentLimit, 10) < 0) {
+      limitInputField.classList.add('negative-balance');
+    } else {
+      limitInputField.classList.remove('negative-balance');
+    }
+  },
+  // состояние кнопок
+  controlsState: function() {
+    var initialBtns = document.querySelectorAll('.init-load-btn');
+    var inProcessBtns = document.querySelectorAll('.in-process-btn');
+
+    if(!countdownIsOn) {
+      initialBtns.forEach(function(btn) {
+        btn.disabled = false;
+        btn.classList.remove('inactive');
+      });
+      inProcessBtns.forEach(function(btn) {
+        btn.disabled = true;
+        btn.classList.add('inactive');
+      });
+      limitInputField.style.fontSize = '0.9em';
+    } else {
+      inProcessBtns.forEach(function(btn) {
+        btn.disabled = false;
+        btn.classList.remove('inactive');
+      });
+      initialBtns.forEach(function(btn) {
+        btn.disabled = true;
+        btn.classList.add('inactive');
+      });
+      limitInputField.style.fontSize = '1.25em';
+    }
+  },
+  // отображение поп-апов
+  togglePopUpView: function(pop) {
+    console.log(pop.style.display);
+    if(pop.style.display === 'flex') {
+      pop.style.display = '';
+    } else {
+      pop.style.display = 'flex';
+    }
+  },
+  // очистка поля с сообщением
+  cleanAdviser: function() {
+    clearInterval(animateAdvise);
+    clearTimeout(messageHide);
+    adviserContainer.innerHTML = '';
+    adviserContainer.className = '';
+  },
+  // cписание средств
+  limitSubtract: function() {
+    if(Number.isInteger(expense) && expense > 0 && expense < 30000) {
+      currentLimit = localStorage.currentLimit || initialLimit;
+      currentLimit -= expense;
+      localStorage.setItem('currentLimit', currentLimit);
+      limitInputField.value = currentLimit;
+      //addExpenseItem(setExpenseNameField.value);
+      this.checkColorIndicator();
+
+      if(currentLimit < -30000) {
+        countdownIsOn = false;
+        this.togglePopUpView(endPopUp);
+        endPopUpFill();
+        return 'Вы превысили лимит';
+      }
+
+      return currentLimit;
+    } else {
+      showSystemMessage(systemMessage.expenseErrorTxt, systemMessage.messageType[0], 10000);
+      return 'Значение некорректно';
+    }
+  },
+  // значения для списания
+  setExpensePopUpFill: function() {
+    expense = parseInt(setExpenseValueField.value, 10);
+    this.togglePopUpView(setExpensePopUp);
+    this.limitSubtract();
+  }
+};
+
 var SEC_IN_DAY = 86400;
 var secInPassedDays = 86400;
 
@@ -18,7 +126,6 @@ var endPopUp = document.querySelector('#end-pop-up');
 
 var setLimitPopUp = document.querySelector('#setlimit-pop-up');
 var deadlineRange = document.querySelector('#deadline-range-field');
-var deadlineRangeOutput = document.querySelector('#deadline-range-output');
 var setlimitField = document.querySelector('#setlimit-field');
 
 // Поп-ап подтверждение рестарта
@@ -40,14 +147,14 @@ window.onload = function() {
     limitInputField.value = currentLimit;
   } else if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
     countdownIsOn = false;
-    togglePopUpView(endPopUp);
+    simpl.togglePopUpView(endPopUp);
     endPopUpFill();
   } else if(localStorage.initialLimit) {
     init();
     initialLimit = localStorage.initialLimit;
     limitInputField.value = initialLimit;
   } else {
-    controlsState();
+    simpl.controlsState();
   }
 };
 
@@ -59,70 +166,13 @@ function init() {
   deadLinePeriod = localStorage.deadLinePeriod;
   secInPassedDays = localStorage.secInPassedDays;
   countdownIsOn = true;
-  controlsState();
-  setColorIndicator();
+  simpl.controlsState();
+  simpl.checkColorIndicator();
   countdownWork();
   clearTimeout(showTimer);
   var showTimer = setTimeout(function() {
     countdownContainer.style.display = 'block';
   }, 1000);
-}
-
-// Переключение состояния кнопок
-
-function controlsState() {
-  var initialBtns = document.querySelectorAll('.init-load-btn');
-  var inProcessBtns = document.querySelectorAll('.in-process-btn');
-
-  if(!countdownIsOn) {
-    initialBtns.forEach(function(btn) {
-      btn.disabled = false;
-      btn.classList.remove('inactive');
-    });
-    inProcessBtns.forEach(function(btn) {
-      btn.disabled = true;
-      btn.classList.add('inactive');
-    });
-    limitInputField.style.fontSize = '0.9em';
-  } else {
-    inProcessBtns.forEach(function(btn) {
-      btn.disabled = false;
-      btn.classList.remove('inactive');
-    });
-    initialBtns.forEach(function(btn) {
-      btn.disabled = true;
-      btn.classList.add('inactive');
-    });
-    limitInputField.style.fontSize = '1.25em';
-  }
-}
-
-// Первоначальная установка лимита
-
-function setLimit() {
-  cleanAdviser();
-  if(checkLimit()) {
-    limitInputField.value = initialLimit;
-    localStorage.setItem('initialLimit', initialLimit);
-    localStorage.setItem('secInPassedDays', secInPassedDays);
-    setInitialTimer();
-    setTimeout(function() {
-      countdownWork();
-      countdownContainer.style.display = 'block';
-    }, 1000);
-    controlsState();
-    return initialLimit;
-  } else {
-    showSystemMessage(systemMessage.limitErrorTxt, systemMessage.messageType[0], 10000);
-    return 'Значение некорректно';
-  }
-}
-
-// Проверка правильности введенного значения - лимит
-
-function checkLimit() {
-  return deadLinePeriod && Number.isInteger(deadLinePeriod) && deadLinePeriod >= 1 && deadLinePeriod <= 9
-  && initialLimit > 0 && Number.isInteger(initialLimit) && initialLimit < 30000;
 }
 
 // Обновление текущего лимита раз в сутки
@@ -132,50 +182,20 @@ function renewLimit(sum) {
   currentLimit += sum;
   limitInputField.value = currentLimit;
   localStorage.setItem('currentLimit', currentLimit);
-  setColorIndicator();
-}
-
-// Списание
-
-function limitSubtract() {
-  if(checkExpense()) {
-    currentLimit = localStorage.currentLimit || initialLimit;
-    currentLimit -= expense;
-    localStorage.setItem('currentLimit', currentLimit);
-    limitInputField.value = currentLimit;
-    addExpenseItem(setExpenseNameField.value);
-    setColorIndicator();
-
-    if (currentLimit < -30000) {
-      countdownIsOn = false;
-      togglePopUpView(endPopUp);
-      endPopUpFill();
-      return 'Вы превысили лимит';
-    }
-
-    return currentLimit;
-  }
-  showSystemMessage(systemMessage.expenseErrorTxt, systemMessage.messageType[0], 10000);
-  return 'Значение некорректно';
-}
-
-// Проверка правильности введенного значения - списание
-
-function checkExpense() {
-  return expense && expense > 0 && Number.isInteger(expense) && expense < 30000;
+  simpl.checkColorIndicator();
 }
 
 // Рестарт приложения
 
 function restart() {
   countdownIsOn = false;
-  controlsState();
-  cleanAdviser();
+  simpl.controlsState();
+  simpl.cleanAdviser();
   localStorage.clear();
   initialLimit = currentLimit = limitInputField.value = setlimitField.value = startDeadLine = endDeadLine = deadLinePeriod = '';
   setExpensePopUp.style.display = restartConfirmPopUp.style.display = setLimitPopUp.style.display = 'none';
   secInPassedDays = 86400;
-  setColorIndicator();
+  simpl.checkColorIndicator();
 }
 
 // Таймер
@@ -208,7 +228,7 @@ function countdownWork() {
         localStorage.setItem('secInPassedDays', secInPassedDays);
       }
       countdownIsOn = false;
-      togglePopUpView(endPopUp);
+      simpl.togglePopUpView(endPopUp);
       endPopUpFill();
       return false;
     }
@@ -253,34 +273,37 @@ var systemMessage = {
   messageType: ['error-message-open', 'regular-message-open']
 };
 
+// (временно задизейблено)
+
 // Массив со списком покупок
 
-var purchaseArray = [];
-var expenseList = document.createElement('ul');
-expenseList.classList.add('expense-list');
-adviserContainer.appendChild(expenseList);
+// var purchaseArray = [];
+// var expenseList = document.createElement('ul');
+// expenseList.classList.add('expense-list');
+// adviserContainer.appendChild(expenseList);
 
 // Наполнение массива с покупками
 
-function addExpenseItem(expenseItem) {
-  purchaseArray.unshift(expenseItem);
-  var expenseListItem = document.createElement('li');
-  var expenseText = document.createTextNode(purchaseArray[purchaseArray.indexOf(expenseItem)]);
-  expenseListItem.appendChild(expenseText);
-  expenseList.insertBefore(expenseListItem, expenseList.childNodes[0]);
+// function addExpenseItem(expenseItem) {
+//   purchaseArray.unshift(expenseItem);
+//   var expenseListItem = document.createElement('li');
+//   var expenseText = document.createTextNode(purchaseArray[purchaseArray.indexOf(expenseItem)]);
+//   expenseListItem.appendChild(expenseText);
+//   expenseList.insertBefore(expenseListItem, expenseList.childNodes[0]);
 
 
-  if(purchaseArray.length > 5) {
-    purchaseArray.pop();
-    expenseList.removeChild(expenseList.childNodes[5]);
-  }
-}
+//   if(purchaseArray.length > 5) {
+//     purchaseArray.pop();
+//     expenseList.removeChild(expenseList.childNodes[5]);
+//   }
+// }
 
 // Вывод системных сообщений (с анимацией)
 
 function showSystemMessage(systemMessageText, messageType, expandTime) {
   var i = 0;
   var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
+  simpl.cleanAdviser();
   animateAdvise = setInterval(function() {
     adviserContainer.innerHTML += systemMessageText[i];
     i++;
@@ -291,21 +314,8 @@ function showSystemMessage(systemMessageText, messageType, expandTime) {
     }
   }, 20); // магическое число
   messageHide = setTimeout(function() {
-    if(adviserContainer.classList.contains('error-message-open') || adviserContainer.classList.contains('regular-message-open')) {
-      cleanAdviser();
-    } else {
-      clearTimeout(messageHide);
-    }
-  }, expandTime);
-}
-
-// Очистка поля сообщения
-
-function cleanAdviser() {
-  clearInterval(animateAdvise);
-  clearTimeout(messageHide);
-  adviserContainer.innerHTML = '';
-  adviserContainer.className = '';
+    simpl.cleanAdviser();
+  }, expandTime = expandTime || 5000);
 }
 
 // Вывод и наполнение финального поп-апа
@@ -348,39 +358,6 @@ function endPopUpFill() {
   }
 }
 
-// Задание значений для поп-апа установки лимита
-
-function setLimitPopUpFill(callback) {
-  initialLimit = parseInt(setlimitField.value, 10);
-  deadLinePeriod = parseInt(deadlineRange.value, 10);
-  togglePopUpView(setLimitPopUp);
-  callback();
-}
-
-// Задание значений для поп-апа списания
-
-function setExpensePopUpFill(callback) {
-  expense = parseInt(setExpenseValueField.value, 10);
-  togglePopUpView(setExpensePopUp);
-  callback();
-}
-
-// Открытие поп-апа (универсальное)
-
-function togglePopUpView(pop) {
-  pop.style.display = pop.style.display === 'flex' ? '' : 'flex';
-}
-
-// Добавление полю limitInputField класса при отрицательном балансе
-
-function setColorIndicator() {
-  if(parseInt(localStorage.currentLimit, 10) < 0) {
-    limitInputField.classList.add('negative-balance');
-  } else {
-    limitInputField.classList.remove('negative-balance');
-  }
-}
-
 // Обработчики по кликам на кнопки
 
 workingSpace.addEventListener('click', function(evt) {
@@ -389,22 +366,22 @@ workingSpace.addEventListener('click', function(evt) {
   var popup = document.getElementById(popId);
 
   if(id === 'set-limit-btn' || id === 'reset-btn' || id === 'limit-subtract-btn' || id === 'restart-cancel') {
-    togglePopUpView(popup);
+    simpl.togglePopUpView(popup);
   } else if(id === 'end-restart' || id === 'restart-confirm') {
-    togglePopUpView(popup);
+    simpl.togglePopUpView(popup);
     restart();
   } else if(id === 'setlimit-cancel') {
-    togglePopUpView(popup);
+    simpl.togglePopUpView(popup);
     setlimitField.value = '';
   } else if(id === 'setexpense-cancel') {
-    togglePopUpView(popup);
+    simpl.togglePopUpView(popup);
     setExpenseValueField.value = '';
     setExpenseNameField.value = '';
   } else if(id === 'setlimit-submit') {
-    setLimitPopUpFill(setLimit);
+    simpl.setLimitPopUpFill(simpl.setLimit);
     setlimitField.value = '';
   } else if(id === 'setexpense-submit') {
-    setExpensePopUpFill(limitSubtract);
+    simpl.setExpensePopUpFill();
     setExpenseValueField.value = '';
     setExpenseNameField.value = '';
   }
@@ -413,9 +390,14 @@ workingSpace.addEventListener('click', function(evt) {
 // Поп-ап установка лимита
 
 deadlineRange.addEventListener('input', function() {
+  var deadlineRangeOutput = document.querySelector('#deadline-range-output');
   deadlineRangeOutput.innerHTML = deadlineRange.value;
 });
 
-// FIXES
+// Цели
 
 // 1. Максимально спрятать глобальные переменные
+
+// Баги
+
+// 1. Системный текст в поле сообщений не перезаписывается, а добавляется один к другому (исправлено - функция cleanAdviser перенесена выше по коду)

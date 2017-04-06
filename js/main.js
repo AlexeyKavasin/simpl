@@ -1,6 +1,13 @@
 'use strict';
 
 var simpl = {
+  // первоначальные значения для установки лимита
+  setLimitPopUpFill: function() {
+    initialLimit = parseInt(setlimitField.value, 10);
+    deadLinePeriod = parseInt(deadlineRange.value, 10);
+    this.togglePopUpView(setLimitPopUp);
+    this.setLimit();
+  },
   // первоначальная установка лимита
   setLimit: function() {
     this.cleanAdviser();
@@ -18,13 +25,6 @@ var simpl = {
     }, 1000);
     this.controlsState();
     return initialLimit;
-  },
-  // первоначальные значения для установки лимита
-  setLimitPopUpFill: function() {
-    initialLimit = parseInt(setlimitField.value, 10);
-    deadLinePeriod = parseInt(deadlineRange.value, 10);
-    this.togglePopUpView(setLimitPopUp);
-    this.setLimit();
   },
   // индикатор отрицательного баланса
   checkColorIndicator: function() {
@@ -63,7 +63,6 @@ var simpl = {
   },
   // отображение поп-апов
   togglePopUpView: function(pop) {
-    console.log(pop.style.display);
     if(pop.style.display === 'flex') {
       pop.style.display = '';
     } else {
@@ -222,6 +221,9 @@ function countdownWork() {
     now = Math.floor((endDeadLine - now) / 1000);
 
     if(now <= 0) {
+      // до тех пор пока текущее прошедшее время меньше установленного срока
+      // и сумма текущего и первоначального лимита не превышает максимально возможной на балансе суммы
+      // обновляем баланс на фиксированную сумму
       while( parseInt(localStorage.secInPassedDays, 10) < (deadLinePeriod * SEC_IN_DAY) &&
         parseInt(localStorage.currentLimit, 10) + parseInt(localStorage.initialLimit, 10) < parseInt(localStorage.initialLimit, 10) * deadLinePeriod ) {
         renewLimit(parseInt(localStorage.initialLimit, 10));

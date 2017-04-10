@@ -5,7 +5,7 @@ var workingSpace = document.querySelector('#main');
 var limitInputField = document.querySelector('#limit-field'); // Поле с суммой
 var adviserContainer = document.querySelector('#adviser-content-wrapper'); // Поле для вывода сообщений
 var countdownContainer = document.getElementById('countdown'); // Контейнер для таймера
-var initialLimit, currentLimit, expense, endDeadLine, startDeadLine, deadLinePeriod, animateAdvise, messageHide;
+var endDeadLine, startDeadLine, deadLinePeriod, animateAdvise, messageHide;
 // Поп-ап со статистикой (финальный)
 var endPopUp = document.querySelector('#end-pop-up');
 // Поп-ап установка лимита
@@ -18,9 +18,12 @@ var setExpenseValueField = document.querySelector('#setexpense-value-field');
 var simpl = {
   SEC_IN_DAY: 86400,
   secInPassedDays: 86400,
+  expense: 0,
+  initialLimit: this.initialLimit || localStorage.initialLimit || 0,
+  currentLimit: this.currentLimit || localStorage.currentLimit || 0,
   // значения для установки лимита
   setLimitPopUpFill: function() {
-    initialLimit = parseInt(setlimitField.value, 10);
+    this.initialLimit = parseInt(setlimitField.value, 10);
     deadLinePeriod = parseInt(deadlineRange.value, 10);
     var setLimitPopUp = document.querySelector('#setlimit-pop-up');
     this.togglePopUpView(setLimitPopUp);
@@ -30,12 +33,12 @@ var simpl = {
   setLimit: function() {
     var self = this;
     this.cleanAdviser();
-    if(deadLinePeriod < 1 || deadLinePeriod > 9 || initialLimit < 0 || isNaN(initialLimit) || initialLimit > 30000) {
+    if(deadLinePeriod < 1 || deadLinePeriod > 9 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 30000) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
       return 'Значение некорректно';
     }
-    limitInputField.value = initialLimit;
-    localStorage.setItem('initialLimit', initialLimit);
+    limitInputField.value = this.initialLimit;
+    localStorage.setItem('initialLimit', this.initialLimit);
     localStorage.setItem('secInPassedDays', this.secInPassedDays);
     this.setInitialTimer();
     setTimeout(function() {
@@ -43,7 +46,9 @@ var simpl = {
       countdownContainer.style.display = 'block';
     }, 1000);
     this.controlsState();
-    return initialLimit;
+    this.currentLimit = this.initialLimit;
+    localStorage.setItem('currentLimit', this.currentLimit);
+    return this.initialLimit;
   },
   // таймер
   // установка
@@ -113,35 +118,35 @@ var simpl = {
   },
    // значения для списания
   setExpensePopUpFill: function() {
-    expense = parseInt(setExpenseValueField.value, 10);
+    this.expense = parseInt(setExpenseValueField.value, 10);
     var setExpensePopUp = document.querySelector('#setexpense-pop-up');
     this.togglePopUpView(setExpensePopUp);
     this.limitSubtract();
   },
   // cписание средств
   limitSubtract: function() {
-    if(Number.isInteger(expense) && expense > 0 && expense < 30000) {
-      currentLimit = localStorage.currentLimit || initialLimit;
-      currentLimit -= expense;
-      localStorage.setItem('currentLimit', currentLimit);
-      limitInputField.value = currentLimit;
+    if(Number.isInteger(this.expense) && this.expense > 0 && this.expense < 30000) {
+      this.currentLimit = localStorage.currentLimit || this.initialLimit;
+      this.currentLimit -= this.expense;
+      localStorage.setItem('currentLimit', this.currentLimit);
+      limitInputField.value = this.currentLimit;
       //addExpenseItem(setExpenseNameField.value);
       this.checkColorIndicator();
 
-      if(currentLimit < -30000) {
+      if(this.currentLimit < -30000) {
         countdownIsOn = false;
         this.togglePopUpView(endPopUp);
         this.endPopUpFill();
         return 'Вы превысили лимит';
       }
 
-      return currentLimit;
+      return this.currentLimit;
     } else {
       this.showSystemMessage(this.systemMessages.expenseErrorTxt, this.systemMessages.messageType['error'], 10000);
       return false;
     }
   },
-  // запуск приложения при повтороной загрузке
+  // запуск приложения при повторной загрузке
   init: function() {
     startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
     endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
@@ -158,10 +163,10 @@ var simpl = {
   },
   // обновление текущего лимита раз в сутки
   renewLimit: function(sum) {
-    currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
-    currentLimit += sum;
-    limitInputField.value = currentLimit;
-    localStorage.setItem('currentLimit', currentLimit);
+    this.currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
+    this.currentLimit += sum;
+    limitInputField.value = this.currentLimit;
+    localStorage.setItem('currentLimit', this.currentLimit);
     this.checkColorIndicator();
   },
   // рестарт
@@ -170,8 +175,8 @@ var simpl = {
     this.controlsState();
     this.cleanAdviser();
     localStorage.clear();
-    initialLimit = '';
-    currentLimit = '';
+    this.initialLimit = '';
+    this.currentLimit = '';
     startDeadLine = '';
     endDeadLine = '';
     deadLinePeriod = '';
@@ -187,37 +192,37 @@ var simpl = {
   endPopUpFill: function() {
     var endVerdict = document.querySelector('#end-verdict');
     var endStat = document.querySelector('#end-stat');
-    initialLimit = parseInt(localStorage.initialLimit, 10);
-    currentLimit = parseInt(localStorage.currentLimit, 10);
+    this.initialLimit = parseInt(localStorage.initialLimit, 10);
+    this.currentLimit = parseInt(localStorage.currentLimit, 10);
     deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
-    limitInputField.value = currentLimit;
+    limitInputField.value = this.currentLimit;
 
-    if(!currentLimit || currentLimit > -30000) {
+    if(!this.currentLimit || this.currentLimit > -30000) {
       endVerdict.innerHTML = '<p>Время истекло</p><br>';
     } else {
       endVerdict.innerHTML = '<p>Превышен лимит трат</p><br>';
     }
 
-    if(!currentLimit || currentLimit === initialLimit * deadLinePeriod) {
+    if(!this.currentLimit || this.currentLimit === this.initialLimit * deadLinePeriod) {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + initialLimit + '</p>' +
+      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
       '<p>Период (в днях): ' + deadLinePeriod + '</p>' +
       '<p>Потрачено за период: 0</p>' +
-      '<p>Сэкономлено: ' + initialLimit + '</p>' +
+      '<p>Сэкономлено: ' + this.initialLimit + '</p>' +
       '<p>Возможно, вы не записывали свои расходы. Попробуйте еще раз.</p>';
-    } else if(currentLimit < 0) {
+    } else if(this.currentLimit < 0) {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + initialLimit + '</p>' +
+      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
       '<p>Период (в днях): ' + deadLinePeriod + '</p>' +
-      '<p>Потрачено за период: ' + ((initialLimit * deadLinePeriod) + Math.abs(currentLimit)) + '</p>' +
-      '<p>Перерасход составил: ' + Math.abs(currentLimit) + '</p>' +
+      '<p>Потрачено за период: ' + ((this.initialLimit * deadLinePeriod) + Math.abs(this.currentLimit)) + '</p>' +
+      '<p>Перерасход составил: ' + Math.abs(this.currentLimit) + '</p>' +
       '<p>Попробуйте еще раз.</p>';
     } else {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + initialLimit + '</p>' +
+      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
       '<p>Период (в днях): ' + deadLinePeriod + '</p>' +
-      '<p>Потрачено за период: ' + ((initialLimit * deadLinePeriod) - currentLimit) + '</p>' +
-      '<p>Сэкономлено: ' + currentLimit + '</p>' +
+      '<p>Потрачено за период: ' + ((this.initialLimit * deadLinePeriod) - this.currentLimit) + '</p>' +
+      '<p>Сэкономлено: ' + this.currentLimit + '</p>' +
       '<p>Попробуйте еще раз.</p>';
     }
   },
@@ -284,7 +289,7 @@ var simpl = {
         adviserContainer.innerHTML += blinkingCursor;
         adviserContainer.classList.add(messageType);
       }
-    }, 20); // магическое число
+    }, 30); // магическое число
     messageHide = setTimeout(function() {
       self.cleanAdviser();
     }, expandTime = expandTime || 5000);
@@ -304,16 +309,16 @@ var simpl = {
 window.onload = function() {
   if(localStorage.currentLimit && localStorage.currentLimit > -30000) {
     simpl.init();
-    currentLimit = localStorage.currentLimit;
-    limitInputField.value = currentLimit;
+    simpl.currentLimit = localStorage.currentLimit;
+    limitInputField.value = simpl.currentLimit;
   } else if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
     countdownIsOn = false;
     simpl.togglePopUpView(endPopUp);
     simpl.endPopUpFill();
   } else if(localStorage.initialLimit) {
     simpl.init();
-    initialLimit = localStorage.initialLimit;
-    limitInputField.value = initialLimit;
+    simpl.initialLimit = localStorage.initialLimit;
+    limitInputField.value = simpl.initialLimit;
   } else {
     simpl.controlsState();
   }
@@ -348,14 +353,14 @@ workingSpace.addEventListener('click', function(evt) {
 
 // Поп-ап установка лимита
 deadlineRange.addEventListener('input', function() {
-  var deadlineRangeOutput = document.querySelector('#deadline-range-output');
-  deadlineRangeOutput.innerHTML = deadlineRange.value;
+  var rangeOutput = document.querySelector('#deadline-range-output');
+  rangeOutput.innerHTML = deadlineRange.value;
 });
 
 // Цели
 
 // 1. Максимально спрятать глобальные переменные
-// 2. Что-то сделать с animateAdvise, messageHide.Не нравится мне что они в глобальной области видимости
+// 2. Что-то сделать с animateAdvise, messageHide. Не нравится мне что они в глобальной области видимости
 
 // Баги
 

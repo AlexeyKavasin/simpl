@@ -1,3 +1,65 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+body {
+  width: 100%;
+  height: 100%;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  font-family: 'monospace';
+  background: #fff;
+  font-size: 14px;
+}
+
+/*Input type number styling*/
+
+#setlimit-field,
+#setexpense-field {
+  -moz-appearance: textfield;
+}
+
+#setexpense-value-field::-webkit-inner-spin-button,
+#setlimit-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+#setexpense-value-field::-webkit-outer-spin-button,
+#setlimit-field::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+// Misc
+
+.negative-balance {
+  box-shadow: inset -1px -3px 0 -1px #ff3c3c;
+}
+
+.error-message-open,
+.regular-message-open {
+  opacity: 1;
+  box-shadow: inset -1px -3px 0 -1px #020604;
+  transition: all .3s ease;
+}
+
+.error-message-open {
+  box-shadow: inset -1px -3px 0 -1px #ff3c3c;
+}
+
+.blinking-cursor {
+  font-size: 1em;
+  -webkit-animation: blink-animation .9s infinite;
+  -o-animation: blink-animation .9s infinite;
+  animation: blink-animation .9s infinite;
+  background: #020604;
+}
+
 // Animations
 
 @keyframes blink-animation {
@@ -7,128 +69,4 @@
   50% {
     opacity: 1;
   }
-}
-
-/*Input type range styling*/
-
-.deadline-range-block input[type=range] {
-  outline: none;
-  -webkit-appearance: none;
-  width: 100%;
-  background: transparent;
-}
-
-.deadline-range-block  input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-}
-
-.deadline-range-block input[type=range]:focus {
-  outline: none;
-}
-
-.deadline-range-block input[type=range]::-ms-track {
-  width: 100%;
-  cursor: pointer;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-}
-
-.deadline-range-block input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  border: 1px solid #020604;
-  height: 36px;
-  width: 16px;
-  background: #ffffff;
-  cursor: pointer;
-  margin-top: -14px;
-  box-shadow: inset -1px -1px 0 1px #020604;
-}
-
-.deadline-range-block input[type=range]::-moz-range-thumb {
-  box-shadow: inset -1px -1px 0 1px #020604;
-  border: 1px solid #020604;
-  height: 36px;
-  width: 16px;
-  background: #ffffff;
-  cursor: pointer;
-}
-
-.deadline-range-block input[type=range]::-ms-thumb {
-  box-shadow: inset -1px -1px 0 1px #020604;
-  border: 1px solid #020604;
-  height: 36px;
-  width: 16px;
-  background: #ffffff;
-  cursor: pointer;
-}
-
-.deadline-range-block input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  box-shadow: inset -1px -1px 0 1px #020604;
-  background: #ffffff;
-  border: 0.2px solid #010101;
-}
-
-.deadline-range-block input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #ffffff;
-}
-
-.deadline-range-block input[type=range]::-moz-range-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  box-shadow: inset -1px -1px 0 1px #020604;
-  background: #ffffff;
-  border: 0.2px solid #010101;
-}
-
-.deadline-range-block input[type=range]::-ms-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  background: transparent;
-  border-color: transparent;
-  border-width: 16px 0;
-  color: transparent;
-}
-.deadline-range-block input[type=range]::-ms-fill-lower {
-  background: #ffffff;
-  border: 0.2px solid #010101;
-  box-shadow: inset -1px -1px 0 1px #020604;
-}
-.deadline-range-block input[type=range]:focus::-ms-fill-lower {
-  background: #ffffff;
-}
-.deadline-range-block input[type=range]::-ms-fill-upper {
-  background: #ffffff;
-  border: 0.2px solid #010101;
-  box-shadow: inset -1px -1px 0 1px #020604;
-}
-.deadline-range-block input[type=range]:focus::-ms-fill-upper {
-  background: #ffffff;
-}
-
-/*Input type number styling*/
-
-.setlimit-field,
-.setexpense-field {
-  -moz-appearance: textfield;
-}
-
-.setexpense-field::-webkit-inner-spin-button,
-.setlimit-field::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-}
-.setexpense-field::-webkit-outer-spin-button,
-.setlimit-field::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-}
-
-// Misc
-
-.negative-balance {
-  box-shadow: inset -1px -3px 0 -1px #ff3c3c;
 }

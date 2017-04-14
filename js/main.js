@@ -11,6 +11,7 @@ var simpl = {
   deadLinePeriod: localStorage.deadLinePeriod || this.deadLinePeriod || '',
   endDeadLine: localStorage.endDeadLine || this.endDeadLine || '',
   expenseItems: localStorage.expenseItems || this.expenseItems || [],
+
   // DOM элементы
   workingSpace: document.querySelector('#main'),
   adviserContainer: document.querySelector('#adviser-content-wrapper'),
@@ -19,9 +20,11 @@ var simpl = {
   setlimitField: document.querySelector('#setlimit-field'),
   deadlineRange: document.querySelector('#deadline-range-field'),
   endPopUp: document.querySelector('#end-pop-up'),
+
   // для setTimeout и setInterval
   messageHide: this.messageHide || '',
   animateAdvise: this.animateAdvise || '',
+
   // значения для установки лимита
   setLimitPopUpFill: function() {
     var setLimitPopUp = document.querySelector('#setlimit-pop-up');
@@ -29,22 +32,22 @@ var simpl = {
     this.deadLinePeriod = parseInt(this.deadlineRange.value, 10);
     this.togglePopUpView(setLimitPopUp);
     this.setLimit();
-    this.clearPopUpFields();
   },
+
+  // добавление обработчиков
   addListeners: function() {
     var self = simpl;
-
     self.deadlineRange.addEventListener('input', function() {
       var rangeOutput = document.querySelector('#deadline-range-output');
       rangeOutput.innerHTML = self.deadlineRange.value;
     });
-
     self.workingSpace.addEventListener('click', self.btnAction);
   },
+
   // установка лимита
   setLimit: function() {
     this.cleanAdviser();
-    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 9 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 30000) {
+    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 9 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit >= 30000) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
       return 'Значение некорректно';
     }
@@ -61,8 +64,8 @@ var simpl = {
     localStorage.setItem('currentLimit', this.currentLimit);
     return this.initialLimit;
   },
-  // таймер
-  // установка
+
+  // установка таймера
   setInitialTimer: function() {
     this.startDeadLine = new Date();
     this.endDeadLine = new Date();
@@ -72,14 +75,14 @@ var simpl = {
     localStorage.setItem('deadLinePeriod', this.deadLinePeriod);
     this.countdownIsOn = true;
   },
-  // запуск и работа
+
+  // запуск и работа таймера
   countdownWork: function() {
     if(!this.countdownIsOn) {
       this.countdownContainer.innerHTML = '';
     } else {
       var now = new Date();
       now = Math.floor((this.endDeadLine - now) / 1000);
-
       if(now <= 0) {
         // до тех пор пока текущее прошедшее время меньше установленного срока
         // и сумма текущего и первоначального лимита не превышает максимально возможной на балансе суммы
@@ -94,14 +97,12 @@ var simpl = {
         this.endPopUpFill();
         return false;
       }
-
       if( ((this.deadLinePeriod * this.SEC_IN_DAY) - now) > parseInt(localStorage.secInPassedDays, 10) && now > 0 ) {
         this.renewLimit(parseInt(localStorage.initialLimit, 10));
         this.secInPassedDays = parseInt(localStorage.secInPassedDays, 10);
         this.secInPassedDays += this.SEC_IN_DAY;
         localStorage.setItem('secInPassedDays', this.secInPassedDays);
       }
-
       var tsec = now % 60;
       now = Math.floor(now / 60);
       if(tsec < 10) {
@@ -117,15 +118,14 @@ var simpl = {
       if(thour < 10) {
         thour = '0' + thour;
       }
-
       this.countdownContainer.innerHTML = thour + ':' + tmin + ':' + tsec;
-
       setTimeout(function() {
         this.countdownWork();
       }.bind(this), 1000);
     }
     return true;
   },
+
    // значения для списания
   setExpensePopUpFill: function() {
     var setExpensePopUp = document.querySelector('#setexpense-pop-up');
@@ -133,8 +133,8 @@ var simpl = {
     this.expense = parseInt(setExpenseValueField.value, 10);
     this.limitSubtract();
     this.togglePopUpView(setExpensePopUp);
-    this.clearPopUpFields();
   },
+
   // cписание средств
   limitSubtract: function() {
     var setExpenseNameField = document.querySelector('#setexpense-name-field');
@@ -143,7 +143,11 @@ var simpl = {
       this.currentLimit -= this.expense;
       localStorage.setItem('currentLimit', this.currentLimit);
       this.limitInputField.value = this.currentLimit;
-      this.addExpenseItem(setExpenseNameField.value);
+      var expenseObj = {
+        name: setExpenseNameField.value,
+        price: this.expense
+      };
+      this.addExpenseItem(expenseObj);
       this.checkColorIndicator();
 
       if(this.currentLimit < -30000) {
@@ -159,38 +163,52 @@ var simpl = {
       return false;
     }
   },
-  // добавление в список трат
+
+  // добавление в список покупок
   addExpenseItem: function(item) {
     if(localStorage.expenseItems) {
-      this.expenseItems = localStorage.expenseItems.split(',');
+      this.expenseItems = JSON.parse(localStorage.expenseItems);
     }
+    var expenseItem = {
+      name: item.name,
+      price: item.price
+    };
     if(this.expenseItems.length >= 3) {
       this.expenseItems.pop();
     }
-    this.expenseItems.unshift(item);
-    localStorage.setItem('expenseItems', this.expenseItems);
+    this.expenseItems.unshift(expenseItem);
+    localStorage.setItem('expenseItems', JSON.stringify(this.expenseItems));
     this.showExpenseList();
   },
-  // отображение списка трат
+
+  // отображение списка покупок
   showExpenseList: function() {
     this.cleanAdviser();
+    var isEmpty = true;
     if(localStorage.expenseItems) {
-      this.expenseItems = localStorage.expenseItems.split(',');
+      this.expenseItems = JSON.parse(localStorage.expenseItems);
+      isEmpty = false;
     }
-    var expenseList = document.createElement('ul');
-    expenseList.classList.add('expense-list');
-    this.adviserContainer.appendChild(expenseList);
-    expenseList.innerHTML = this.expenseItems.map(function(i) {
-      return '<li>' + i + '</li>';
-    }).join('');
+    if(!isEmpty) {
+      var expenseList = document.createElement('ul');
+      expenseList.classList.add('expense-list');
+      this.adviserContainer.appendChild(expenseList);
+      expenseList.innerHTML = this.expenseItems.map(function(i) {
+        return '<li class="expense-list__item">' + i.name + '<span class="expense-list__cash">' + i.price + '</span>' + '</li>';
+      }).join('');
+    }
   },
-  // запуск приложения при повторной загрузке
+
+  // запуск приложения
   init: function() {
+    this.addListeners();
+    this.controlsState();
     if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
       this.countdownIsOn = false;
       this.togglePopUpView(this.endPopUp);
       this.endPopUpFill();
-    } else {
+    }
+    if(localStorage.length) { // ХЗ
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
       this.endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
       this.deadLinePeriod = localStorage.deadLinePeriod;
@@ -207,6 +225,7 @@ var simpl = {
       }.bind(this), 1000);
     }
   },
+
   // обновление текущего лимита раз в сутки
   renewLimit: function(sum) {
     this.currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
@@ -215,7 +234,8 @@ var simpl = {
     localStorage.setItem('currentLimit', this.currentLimit);
     this.checkColorIndicator();
   },
-  // рестарт
+
+  // сброс всего (рестарт)
   restart: function() {
     this.countdownIsOn = false;
     this.controlsState();
@@ -235,6 +255,7 @@ var simpl = {
     this.secInPassedDays = 86400;
     this.checkColorIndicator();
   },
+
   // вывод и наполнение финального поп-апа
   endPopUpFill: function() {
     var endVerdict = document.querySelector('#end-verdict');
@@ -243,13 +264,11 @@ var simpl = {
     this.currentLimit = parseInt(localStorage.currentLimit, 10);
     this.deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
     this.limitInputField.value = this.currentLimit;
-
     if(!this.currentLimit || this.currentLimit > -30000) {
       endVerdict.innerHTML = '<p>Время истекло</p><br>';
     } else {
       endVerdict.innerHTML = '<p>Превышен лимит трат</p><br>';
     }
-
     if(!this.currentLimit || this.currentLimit === this.initialLimit * this.deadLinePeriod) {
       endStat.innerHTML =
       '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
@@ -273,6 +292,7 @@ var simpl = {
       '<p>Попробуйте еще раз.</p>';
     }
   },
+
   // индикатор отрицательного баланса
   checkColorIndicator: function() {
     if(parseInt(localStorage.currentLimit, 10) < 0) {
@@ -281,6 +301,7 @@ var simpl = {
       this.limitInputField.classList.remove('negative-balance');
     }
   },
+
   // состояние кнопок
   controlsState: function() {
     var initialBtns = document.querySelectorAll('.init-load-btn');
@@ -307,6 +328,7 @@ var simpl = {
       this.limitInputField.style.fontSize = '1.25em';
     }
   },
+
   // отображение поп-апов
   togglePopUpView: function(pop) {
     if(pop.style.display === 'flex') {
@@ -314,20 +336,27 @@ var simpl = {
     } else {
       pop.style.display = 'flex';
     }
+    this.clearPopUpFields();
   },
+
+  // очистка полей поп-апов
   clearPopUpFields: function() {
-    var popUpFields = document.querySelectorAll('.pop-up-field');
+    var popUpFields = document.querySelectorAll('.pop-up__field');
     popUpFields.forEach(function(field) {
       field.value = '';
     });
   },
+
   // очистка поля с сообщением
   cleanAdviser: function() {
     clearInterval(this.animateAdvise);
     clearTimeout(this.messageHide);
     this.adviserContainer.innerHTML = '';
     this.adviserContainer.className = '';
+    this.adviserContainer.classList.add('adviser__wrapper');
   },
+
+  // действия для управляющих элементов
   btnAction: function(evt) {
     var self = simpl;
     var id = evt.target.id;
@@ -344,7 +373,8 @@ var simpl = {
       self.setExpensePopUpFill();
     }
   },
-  // вывод системных сообщений (с анимацией)
+
+  // вывод системных сообщений
   showSystemMessage: function(systemMessageText, messageType, expandTime) {
     var i = 0;
     var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
@@ -363,6 +393,7 @@ var simpl = {
       this.showExpenseList();
     }.bind(this), expandTime = expandTime || 5000);
   },
+
   // объект с сообщениями
   systemMessages: {
     expenseErrorTxt: 'Значение некорректно. Допустимая сумма покупки - от 1 до 29999, поле наименование покупки не может быть пустым ',
@@ -374,24 +405,16 @@ var simpl = {
   }
 };
 
-// Условия при загрузке страницы
-window.onload = function() {
-  simpl.addListeners();
-  if(localStorage.length) { // повторная загрузка
-    simpl.init();
-  } else {
-    simpl.controlsState();
-  }
-};
+simpl.init();
 
 // Цели
 
-// 1. Имплементировать список покупок (готово)
-// 2. В списке покупок, напротив наименования мелким шрифтом писать сумму
-// 3. Оптимизировать simpl.init - чет каша какая-то по ощущениям :)
+// 1. Оптимизация - стили, жс в частности simpl.init - чет каша какая-то :)
+// 2. Для пунктов списка expenseItems задавать паддинг справа на js. Паддинг равен span.offsetWidth + стандартный паддинг * 2
+// 3. ДИЗАЙН!
+// 4. Шрифты
 
 // Баги
 
 // 1. Разобраться с потерей контекста в методах countdownWork и showSystemMessage объекта simpl (готово - забиндил ыыы )
-//
 //

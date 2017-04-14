@@ -1,0 +1,12 @@
+.limit {
+	width: 100%;
+  margin: 5% auto;
+  text-align: center;
+  &__field {
+  	width: 100%;
+	  min-height: 50px;
+	  font-size: 0.9em;
+	  text-align: center;
+	  border: none;
+  }
+}

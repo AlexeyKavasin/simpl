@@ -1,0 +1,19 @@
+.expense-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  &__item {
+    position: relative;
+    padding: 5px 10px;
+    font-size: 1em;
+    color: #020604;
+    border-bottom: 1px solid #020604;
+  }
+  &__cash {
+    position: absolute;
+    right: 10px;
+    font-size: .85em;
+    font-weight: normal;
+    color: #b4b4b4;
+  }
+}

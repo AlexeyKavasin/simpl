@@ -304,28 +304,27 @@ var simpl = {
 
   // состояние кнопок
   controlsState: function() {
-    var initialBtns = document.querySelectorAll('.init-load-btn');
-    var inProcessBtns = document.querySelectorAll('.in-process-btn');
-    if(!this.countdownIsOn) {
-      initialBtns.forEach(function(btn) {
-        btn.disabled = false;
-        btn.classList.remove('inactive');
+    var btns = document.querySelectorAll('.btn');
+    if(this.countdownIsOn) {
+      // приложение запущено
+      document.body.classList.add('in-process');
+      btns.forEach(function(btn) {
+        if(btn.classList.contains('init-load-btn')) {
+          btn.disabled = true;
+        } else {
+          btn.disabled = false;
+        }
       });
-      inProcessBtns.forEach(function(btn) {
-        btn.disabled = true;
-        btn.classList.add('inactive');
-      });
-      this.limitInputField.style.fontSize = '0.9em';
     } else {
-      inProcessBtns.forEach(function(btn) {
-        btn.disabled = false;
-        btn.classList.remove('inactive');
+      // приложение не запущено
+      document.body.classList.remove('in-process');
+      btns.forEach(function(btn) {
+        if(btn.classList.contains('in-process-btn')) {
+          btn.disabled = true;
+        } else {
+          btn.disabled = false;
+        }
       });
-      initialBtns.forEach(function(btn) {
-        btn.disabled = true;
-        btn.classList.add('inactive');
-      });
-      this.limitInputField.style.fontSize = '1.25em';
     }
   },
 
@@ -413,6 +412,7 @@ simpl.init();
 // 2. Для пунктов списка expenseItems задавать паддинг справа на js. Паддинг равен span.offsetWidth + стандартный паддинг * 2
 // 3. ДИЗАЙН!
 // 4. Шрифты
+// 5. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
 
 // Баги
 

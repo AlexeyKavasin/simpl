@@ -6,6 +6,7 @@ html {
   width: 100%;
   height: 100%;
 }
+
 body {
   width: 100%;
   height: 100%;
@@ -58,6 +59,24 @@ body {
   -o-animation: blink-animation .9s infinite;
   animation: blink-animation .9s infinite;
   background: #020604;
+}
+
+// Controls in process (countdown is on)
+
+.in-process-btn {
+  opacity: .3;
+}
+
+.in-process .init-load-btn {
+  opacity: .3;
+}
+
+.in-process .in-process-btn {
+  opacity: 1;
+}
+
+.in-process .limit__field {
+  font-size: 1.25em;
 }
 
 // Animations

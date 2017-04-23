@@ -20,6 +20,7 @@ var simpl = {
   setlimitField: document.querySelector('#setlimit-field'),
   deadlineRange: document.querySelector('#deadline-range-field'),
   endPopUp: document.querySelector('#end-pop-up'),
+  rangeOutput: document.querySelector('#deadline-range-output'),
 
   // для setTimeout и setInterval
   messageHide: this.messageHide || '',
@@ -38,8 +39,7 @@ var simpl = {
   addListeners: function() {
     var self = simpl;
     self.deadlineRange.addEventListener('input', function() {
-      var rangeOutput = document.querySelector('#deadline-range-output');
-      rangeOutput.innerHTML = self.deadlineRange.value;
+      self.rangeOutput.innerHTML = self.deadlineRange.value;
     });
     self.workingSpace.addEventListener('click', self.btnAction);
   },
@@ -154,7 +154,7 @@ var simpl = {
         this.countdownIsOn = false;
         this.togglePopUpView(this.endPopUp);
         this.endPopUpFill();
-        return 'Вы превысили лимит';
+        return 'Limit is exceeded';
       }
 
       return this.currentLimit;
@@ -265,31 +265,31 @@ var simpl = {
     this.deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
     this.limitInputField.value = this.currentLimit;
     if(!this.currentLimit || this.currentLimit > -30000) {
-      endVerdict.innerHTML = '<p>Время истекло</p><br>';
+      endVerdict.innerHTML = '<p>Time is up</p><br>';
     } else {
-      endVerdict.innerHTML = '<p>Превышен лимит трат</p><br>';
+      endVerdict.innerHTML = '<p>Purchase limit exceeded</p><br>';
     }
     if(!this.currentLimit || this.currentLimit === this.initialLimit * this.deadLinePeriod) {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
-      '<p>Период (в днях): ' + this.deadLinePeriod + '</p>' +
-      '<p>Потрачено за период: 0</p>' +
-      '<p>Сэкономлено: ' + this.initialLimit + '</p>' +
-      '<p>Возможно, вы не записывали свои расходы. Попробуйте еще раз.</p>';
+      '<p>Day limit: ' + this.initialLimit + '</p>' +
+      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
+      '<p>Spent: 0</p>' +
+      '<p>Saved: ' + this.initialLimit + '</p>' +
+      '<p>Probably you did wrong or didn\'t write down your purchases. Try again.</p>';
     } else if(this.currentLimit < 0) {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
-      '<p>Период (в днях): ' + this.deadLinePeriod + '</p>' +
-      '<p>Потрачено за период: ' + ((this.initialLimit * this.deadLinePeriod) + Math.abs(this.currentLimit)) + '</p>' +
-      '<p>Перерасход составил: ' + Math.abs(this.currentLimit) + '</p>' +
-      '<p>Попробуйте еще раз.</p>';
+      '<p>Day limit: ' + this.initialLimit + '</p>' +
+      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
+      '<p>Spent: ' + ((this.initialLimit * this.deadLinePeriod) + Math.abs(this.currentLimit)) + '</p>' +
+      '<p>Overspent: ' + Math.abs(this.currentLimit) + '</p>' +
+      '<p>Try again.</p>';
     } else {
       endStat.innerHTML =
-      '<p>Дневной лимит: ' + this.initialLimit + '</p>' +
-      '<p>Период (в днях): ' + this.deadLinePeriod + '</p>' +
-      '<p>Потрачено за период: ' + ((this.initialLimit * this.deadLinePeriod) - this.currentLimit) + '</p>' +
-      '<p>Сэкономлено: ' + this.currentLimit + '</p>' +
-      '<p>Попробуйте еще раз.</p>';
+      '<p>Day limit: ' + this.initialLimit + '</p>' +
+      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
+      '<p>Spent: ' + ((this.initialLimit * this.deadLinePeriod) - this.currentLimit) + '</p>' +
+      '<p>Saved: ' + this.currentLimit + '</p>' +
+      '<p>Try again.</p>';
     }
   },
 
@@ -344,6 +344,8 @@ var simpl = {
     popUpFields.forEach(function(field) {
       field.value = '';
     });
+    this.deadlineRange.value = 1;
+    this.rangeOutput.innerHTML = 1;
   },
 
   // очистка поля с сообщением
@@ -395,8 +397,8 @@ var simpl = {
 
   // объект с сообщениями
   systemMessages: {
-    expenseErrorTxt: 'Значение некорректно. Допустимая сумма покупки - от 1 до 29999, поле наименование покупки не может быть пустым ',
-    limitErrorTxt: 'Значение некорректно. Допустимый лимит - от 1 до 29999. Допустимый период - от 1 до 9 дней ',
+    expenseErrorTxt: 'Incorrect value. Allowable purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
+    limitErrorTxt: 'Incorrect value. Allowable limit: 1 to 29999. Allowable period: 1 - 9 days ',
     messageType: {
       error: 'error-message-open',
       regular: 'regular-message-open'
@@ -413,8 +415,10 @@ simpl.init();
 // 3. ДИЗАЙН!
 // 4. Шрифты
 // 5. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
+// 6. Сабмит по ентеру
+// 7. Блок ориентации экрана ???
 
 // Баги
 
-// 1. На телефоне при фокусе в поле суммы, футер поднимается вверх
-//
+// 1. На телефоне при фокусе в поле суммы, футер поднимается вверх (установил минимальную высоту для боди) ✔
+// 2. Сбрасывать состояние  range при выходе из поп-апа установки лимита

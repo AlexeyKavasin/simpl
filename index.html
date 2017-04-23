@@ -17,28 +17,28 @@
     <div class="main" id="main">
       <div class="pop-up" id="setexpense-pop-up">
         <div class="pop-up__wrapper">
-          <p class="pop-up__p">Внесите потраченную сумму</p>
+          <p class="pop-up__p">The amount spent</p>
           <div class="pop-up__field-wrapper">
             <input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>
           </div>
-          <p class="pop-up__p">Внесите наименование покупки</p>
+          <p class="pop-up__p">Purchase description</p>
           <div class="pop-up__field-wrapper">
             <input type="text" class="pop-up__field" id="setexpense-name-field" value="">
           </div>
           <div class="pop-up__controls">
-            <button type="button" class="btn" id="setexpense-submit">OK</button>
-            <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">CANCEL</button>
+            <button type="button" class="btn" id="setexpense-submit">Ok</button>
+            <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>
           </div>
         </div>
       </div>
 
       <div class="pop-up" id="setlimit-pop-up">
         <div class="pop-up__wrapper">
-          <p class="pop-up__p">Задайте дневной лимит.<br> От 1 до 29999.</p>
+          <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>
           <div class="pop-up__field-wrapper">
             <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>
           </div>
-          <p class="pop-up__p">Задайте период.<br> От 1 до 9 (в днях).</p>
+          <p class="pop-up__p">Set a period<br> 1 - 9 (days)</p>
           <div class="pop-up__field-wrapper custom-range">
             <input type="range" id="deadline-range-field" min="1" max="9" step="1" value="1">
           </div>
@@ -46,8 +46,8 @@
             <span id="deadline-range-output">1</span>
           </div>
           <div class="pop-up__controls">
-            <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">OK</button>
-            <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">CANCEL</button>
+            <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>
+            <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>
           </div>
         </div>
       </div>
@@ -57,16 +57,16 @@
           <div id="end-verdict"></div>
           <div id="end-stat"></div>
           <div class="pop-up__controls">
-            <button type="button" class="btn" id="end-restart" data-pop-id="end-pop-up">OK</button>
+            <button type="button" class="btn" id="end-restart" data-pop-id="end-pop-up">Ok</button>
           </div>
         </div>
       </div>
       <div class="pop-up" id="rest-confirm-pop-up">
         <div class="pop-up__wrapper">
-          <p class="pop-up__p">Весь прогресс будет потерян. Продолжить?</p><br>
+          <p class="pop-up__p">Your progress will be lost. Continue?</p><br>
           <div class="pop-up__controls">
-            <button type="button" class="btn" id="restart-confirm" data-pop-id="rest-confirm-pop-up">OK</button>
-            <button type="button" class="btn" id="restart-cancel" data-pop-id="rest-confirm-pop-up">CANCEL</button>
+            <button type="button" class="btn" id="restart-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>
+            <button type="button" class="btn" id="restart-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>
           </div>
         </div>
       </div>
@@ -74,12 +74,12 @@
       <div class="container container--main">
         <div class="limit">
           <label for="limit-field"></label>
-          <input type="text" class="limit__field" id="limit-field" name="limit-field" placeholder="Здесь будет виден ваш текущий баланс" value="" readonly="true">
+          <input type="text" class="limit__field" id="limit-field" name="limit-field" placeholder="You'll see your current balance here" value="" readonly="true">
         </div>
         <div class="controls">
-          <button type= "button" class="btn init-load-btn" id="set-limit-btn" data-pop-id="setlimit-pop-up">Установить период и дневной лимит</button>
-          <button type= "button" class="btn in-process-btn" id="reset-btn" data-pop-id="rest-confirm-pop-up">Начать сначала</button>
-          <button type= "button" class="btn in-process-btn full-width" id="limit-subtract-btn" data-pop-id="setexpense-pop-up">Добавить расход</button>
+          <button type= "button" class="btn init-load-btn" id="set-limit-btn" data-pop-id="setlimit-pop-up">Set period and day limit</button>
+          <button type= "button" class="btn in-process-btn" id="reset-btn" data-pop-id="rest-confirm-pop-up">Restart</button>
+          <button type= "button" class="btn in-process-btn full-width" id="limit-subtract-btn" data-pop-id="setexpense-pop-up">Add expense</button>
         </div>
         <div class="adviser" id="adviser-container">
           <div class="adviser__wrapper" id="adviser-content-wrapper"></div>

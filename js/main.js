@@ -47,9 +47,9 @@ var simpl = {
   // установка лимита
   setLimit: function() {
     this.cleanAdviser();
-    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 9 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit >= 30000) {
+    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
-      return 'Значение некорректно';
+      return 'Invalid value';
     }
     this.limitInputField.value = this.initialLimit;
     localStorage.setItem('initialLimit', this.initialLimit);
@@ -196,6 +196,11 @@ var simpl = {
       expenseList.innerHTML = this.expenseItems.map(function(i) {
         return '<li class="expense-list__item">' + i.name + '<span class="expense-list__cash">' + i.price + '</span>' + '</li>';
       }).join('');
+      var listItems = document.querySelectorAll('.expense-list__item');
+      var defaultPadding = 12;
+      listItems.forEach(function(item) {
+        item.style.paddingRight = item.children[0].offsetWidth + defaultPadding * 2 + 'px';
+      });
     }
   },
 
@@ -208,7 +213,7 @@ var simpl = {
       this.togglePopUpView(this.endPopUp);
       this.endPopUpFill();
     }
-    if(localStorage.length) { // ХЗ
+    if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
       this.endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
       this.deadLinePeriod = localStorage.deadLinePeriod;
@@ -397,8 +402,8 @@ var simpl = {
 
   // объект с сообщениями
   systemMessages: {
-    expenseErrorTxt: 'Incorrect value. Allowable purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
-    limitErrorTxt: 'Incorrect value. Allowable limit: 1 to 29999. Allowable period: 1 - 9 days ',
+    expenseErrorTxt: 'Invalid value. Allowable purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
+    limitErrorTxt: 'Invalid value. Allowable limit: 1 to 29999. Allowable period: 1 - 7 days ',
     messageType: {
       error: 'error-message-open',
       regular: 'regular-message-open'
@@ -418,8 +423,9 @@ simpl.init();
 // 6. Сабмит по ентеру
 // 7. Блок ориентации экрана ???
 // 8. Запретить скролл если заходят с мобилы
+// 9. Поменять em на px. Чето лишний геморрой.
 
 // Баги
 
 // 1. На телефоне при фокусе в поле суммы, футер поднимается вверх (установил минимальную высоту для боди) ✔
-// 2. Сбрасывать состояние  range при выходе из поп-апа установки лимита
+// 2. Сбрасывать состояние  range при выходе из поп-апа установки лимита ✔

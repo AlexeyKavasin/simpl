@@ -55,7 +55,7 @@ body {
 }
 
 .blinking-cursor {
-  font-size: 1em;
+  font-size: 14px;
   -webkit-animation: blink-animation .9s infinite;
   -o-animation: blink-animation .9s infinite;
   animation: blink-animation .9s infinite;
@@ -77,7 +77,7 @@ body {
 }
 
 .in-process .limit__field {
-  font-size: 1.25em;
+  font-size: 24px;
 }
 
 // Animations

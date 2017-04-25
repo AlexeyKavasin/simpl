@@ -198,9 +198,9 @@ var simpl = {
       }).join('');
       var listItems = document.querySelectorAll('.expense-list__item');
       var defaultPadding = 12;
-      listItems.forEach(function(item) {
-        item.style.paddingRight = item.children[0].offsetWidth + defaultPadding * 2 + 'px';
-      });
+      for(var i = 0; i < listItems.length; i++) {
+        listItems[i].style.paddingRight = listItems[i].children[0].offsetWidth + defaultPadding * 2 + 'px';
+      }
     }
   },
 
@@ -254,9 +254,10 @@ var simpl = {
     this.limitInputField.value = '';
     this.setlimitField.value = '';
     localStorage.clear();
-    document.querySelectorAll('.pop-up').forEach(function(p) {
-      p.style.display = '';
-    });
+    var popUps = document.querySelectorAll('.pop-up');
+    for(var i = 0; i < popUps.length; i++) {
+      popUps[i].style.display = '';
+    }
     this.secInPassedDays = 86400;
     this.checkColorIndicator();
   },
@@ -280,7 +281,7 @@ var simpl = {
       '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
       '<p>Spent: 0</p>' +
       '<p>Saved: ' + this.initialLimit + '</p>' +
-      '<p>Probably you did wrong or didn\'t write down your purchases. Try again.</p>';
+      '<p>Probably you did it wrong or didn\'t write down your purchases. Try again.</p>';
     } else if(this.currentLimit < 0) {
       endStat.innerHTML =
       '<p>Day limit: ' + this.initialLimit + '</p>' +
@@ -313,42 +314,38 @@ var simpl = {
     if(this.countdownIsOn) {
       // приложение запущено
       document.body.classList.add('in-process');
-      btns.forEach(function(btn) {
-        if(btn.classList.contains('init-load-btn')) {
-          btn.disabled = true;
+      for(var i = 0; i < btns.length; i++) {
+        if(btns[i].classList.contains('init-load-btn')) {
+          btns[i].disabled = true;
         } else {
-          btn.disabled = false;
+          btns[i].disabled = false;
         }
-      });
+      }
     } else {
       // первоначальное состояние
       document.body.classList.remove('in-process');
-      btns.forEach(function(btn) {
-        if(btn.classList.contains('in-process-btn')) {
-          btn.disabled = true;
+      for(i = 0; i < btns.length; i++) {
+        if(btns[i].classList.contains('in-process-btn')) {
+          btns[i].disabled = true;
         } else {
-          btn.disabled = false;
+          btns[i].disabled = false;
         }
-      });
+      }
     }
   },
 
   // отображение поп-апов
   togglePopUpView: function(pop) {
-    if(pop.style.display === 'flex') {
-      pop.style.display = '';
-    } else {
-      pop.style.display = 'flex';
-    }
+    pop.classList.toggle('pop-visible');
     this.clearPopUpFields();
   },
 
   // очистка полей поп-апов
   clearPopUpFields: function() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
-    popUpFields.forEach(function(field) {
-      field.value = '';
-    });
+    for(var i = 0; i < popUpFields.length; i++) {
+      popUpFields[i].value = '';
+    }
     this.deadlineRange.value = 1;
     this.rangeOutput.innerHTML = 1;
   },
@@ -384,6 +381,7 @@ var simpl = {
   showSystemMessage: function(systemMessageText, messageType, expandTime) {
     var i = 0;
     var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
+    var speed = 30;
     this.cleanAdviser();
     this.animateAdvise = setInterval(function() {
       this.adviserContainer.innerHTML += systemMessageText[i];
@@ -393,7 +391,7 @@ var simpl = {
         this.adviserContainer.innerHTML += blinkingCursor;
         this.adviserContainer.classList.add(messageType);
       }
-    }.bind(this), 30); // магическое число
+    }.bind(this), speed); // магическое число
     this.messageHide = setTimeout(function() {
       this.cleanAdviser();
       this.showExpenseList();
@@ -402,8 +400,8 @@ var simpl = {
 
   // объект с сообщениями
   systemMessages: {
-    expenseErrorTxt: 'Invalid value. Allowable purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
-    limitErrorTxt: 'Invalid value. Allowable limit: 1 to 29999. Allowable period: 1 - 7 days ',
+    expenseErrorTxt: 'Invalid value. Valid purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
+    limitErrorTxt: 'Invalid value. Valid limit: 1 to 29999. Valid period: 1 - 7 days ',
     messageType: {
       error: 'error-message-open',
       regular: 'regular-message-open'
@@ -416,15 +414,16 @@ simpl.init();
 // Цели
 
 // 1. Оптимизация - стили, жс в частности simpl.init - чет каша какая-то :)
-// 2. Для пунктов списка expenseItems задавать паддинг справа на js. Паддинг равен span.offsetWidth + стандартный паддинг * 2 ✔
-// 3. ДИЗАЙН!
-// 4. Шрифты
-// 5. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
-// 6. Сабмит по ентеру
-// 7. Запретить скролл если заходят с мобилы
-// 8. Поменять em на px. Чето лишний геморрой. ✔
+// 2. ДИЗАЙН!
+//  2.1 Лого
+// 3. Шрифты
+// 4. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
+// 5. Сабмит по ентеру
+// 6. Ограничить длину строки "описание покупки"
 
 // Баги
 
 // 1. На телефоне при фокусе в поле суммы, футер поднимается вверх (установил минимальную высоту для боди) ✔
 // 2. Сбрасывать состояние range при выходе из поп-апа установки лимита ✔
+// 3. Ошибки с forEach в FF (btns.forEach; popUpFields) (заменил на обычные циклы) ✔
+// 4. .main флексит весь контент по центру. Без покупок смотрится не очень, ибо покупки при добавлении толкают кнопки наверх (минимальная высота для блока с подсказками) ✔

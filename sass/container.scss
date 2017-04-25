@@ -6,11 +6,16 @@
   &--header {
 		display: flex;
 	  justify-content: space-between;
+    align-items: flex-start;
 	  color: #020604;
   }
   &--main {
   	padding-top: 0;
   	padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   &--footer {
   	padding: 0;

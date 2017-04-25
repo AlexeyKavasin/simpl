@@ -19,6 +19,7 @@ body {
   font-family: 'monospace';
   background: #fff;
   font-size: 14px;
+  line-height: 21px;
 }
 
 /*Input type number styling*/
@@ -62,14 +63,19 @@ body {
   background: #020604;
 }
 
+.main .pop-visible {
+  display: flex;
+  opacity: 1;
+}
+
 // Controls in process (countdown is on)
 
 .in-process-btn {
-  opacity: .3;
+  opacity: .2;
 }
 
 .in-process .init-load-btn {
-  opacity: .3;
+  opacity: .2;
 }
 
 .in-process .in-process-btn {

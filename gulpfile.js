@@ -3,11 +3,13 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var plumber = require('gulp-plumber');
+var pump = require('pump');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer');
 var server = require('browser-sync').create();
 var mqpacker = require('css-mqpacker');
 var minify = require('gulp-csso');
+var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var imagemin = require('gulp-imagemin');
 var run = require('run-sequence');
@@ -48,6 +50,15 @@ gulp.task('style', function() {
     .pipe(server.stream());
 });
 
+gulp.task('compress', function(fn) {
+  pump([
+    gulp.src('js/main.js'),
+    rename('main.min.js'),
+    uglify(),
+    gulp.dest('js')
+  ], fn);
+});
+
 gulp.task('images', function() {
   return gulp.src('img/**/*.{png,jpg,gif}')
     .pipe(imagemin([
@@ -72,5 +83,5 @@ gulp.task('serve', function() {
 });
 
 gulp.task('build', function(fn) {
-  run('clean', 'copy', 'style', 'images', fn);
+  run('clean', 'copy', 'style', 'images', 'compress', fn);
 });

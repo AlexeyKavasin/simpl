@@ -17,8 +17,6 @@ var simpl = {
   adviserContainer: document.querySelector('#adviser-content-wrapper'),
   countdownContainer: document.querySelector('#countdown'),
   limitInputField: document.querySelector('#limit-field'),
-  setlimitField: document.querySelector('#setlimit-field'),
-  deadlineRange: document.querySelector('#deadline-range-field'),
   endPopUp: document.querySelector('#end-pop-up'),
   rangeOutput: document.querySelector('#deadline-range-output'),
 
@@ -29,18 +27,21 @@ var simpl = {
   // значения для установки лимита
   setLimitPopUpFill: function() {
     var setLimitPopUp = document.querySelector('#setlimit-pop-up');
-    this.initialLimit = parseInt(this.setlimitField.value, 10);
-    this.deadLinePeriod = parseInt(this.deadlineRange.value, 10);
+    var setlimitField = document.querySelector('#setlimit-field');
+    var deadlineRange = document.querySelector('#deadline-range-field');
+    this.initialLimit = parseInt(setlimitField.value, 10);
+    this.deadLinePeriod = parseInt(deadlineRange.value, 10);
     this.togglePopUpView(setLimitPopUp);
+    this.removePopUp(setLimitPopUp);
     this.setLimit();
   },
 
   // добавление обработчиков
   addListeners: function() {
     var self = simpl;
-    self.deadlineRange.addEventListener('input', function() {
-      self.rangeOutput.innerHTML = self.deadlineRange.value;
-    });
+    // self.deadlineRange.addEventListener('input', function() {
+    //   self.rangeOutput.innerHTML = self.deadlineRange.value;
+    // });
     self.workingSpace.addEventListener('click', self.btnAction);
   },
 
@@ -335,9 +336,47 @@ var simpl = {
   },
 
   // отображение поп-апов
-  togglePopUpView: function(pop) {
-    pop.classList.toggle('pop-visible');
+  togglePopUpView: function(popUpType) {
+    if(this.workingSpace.classList.contains('pop-up-visible')) {
+      this.workingSpace.classList.remove('pop-up-visible');
+      this.removePopUp(popUpType);
+    } else {
+      this.fillPopUp(popUpType);
+      this.workingSpace.classList.add('pop-up-visible');
+    }
     this.clearPopUpFields();
+  },
+
+  fillPopUp: function(popUpType) {
+    var popUpDiv = document.createElement('div');
+    popUpDiv.classList.add('pop-up');
+    popUpDiv.id = popUpType;
+    if(popUpType === 'setlimit-pop-up') {
+      popUpDiv.innerHTML =
+      '<div class="pop-up__wrapper">' +
+        '<p class="pop-up__p">Set your day limit<br> 1 - 29999</p>' +
+        '<div class="pop-up__field-wrapper">' +
+        '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>' +
+      '</div>' +
+      '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' +
+      '<div class="pop-up__field-wrapper custom-range">' +
+        '<input type="range" id="deadline-range-field" min="1" max="7" step="1" value="1">' +
+      '</div>' +
+      '<div class="pop-up__field-wrapper">' +
+        '<span id="deadline-range-output">1</span>' +
+      '</div>' +
+      '<div class="pop-up__controls">' +
+        '<button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>' +
+        '<button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>' +
+      '</div>';
+    }
+
+    this.workingSpace.appendChild(popUpDiv);
+  },
+
+  removePopUp: function(popUpType) {
+    var removed = document.getElementById(popUpType);
+    this.workingSpace.removeChild(removed);
   },
 
   // очистка полей поп-апов
@@ -346,8 +385,8 @@ var simpl = {
     for(var i = 0; i < popUpFields.length; i++) {
       popUpFields[i].value = '';
     }
-    this.deadlineRange.value = 1;
-    this.rangeOutput.innerHTML = 1;
+    //this.deadlineRange.value = 1;
+    //this.rangeOutput.innerHTML = 1;
   },
 
   // очистка поля с сообщением
@@ -363,17 +402,14 @@ var simpl = {
   btnAction: function(evt) {
     var self = simpl;
     var id = evt.target.id;
-    var popId = evt.target.dataset.popId;
-    var popup = document.getElementById(popId);
-    if(id === 'set-limit-btn' || id === 'reset-btn' || id === 'limit-subtract-btn' || id === 'restart-cancel' || id === 'setlimit-cancel' || id === 'setexpense-cancel') {
-      self.togglePopUpView(popup);
-    } else if(id === 'end-restart' || id === 'restart-confirm') {
-      self.togglePopUpView(popup);
+    var popUpType = evt.target.dataset.popId;
+    if(id === 'end-restart' || id === 'restart-confirm') {
+      self.togglePopUpView(popUpType);
       self.restart();
     } else if(id === 'setlimit-submit') {
       self.setLimitPopUpFill();
-    } else if(id === 'setexpense-submit') {
-      self.setExpensePopUpFill();
+    } else {
+      self.togglePopUpView(popUpType);
     }
   },
 
@@ -415,7 +451,7 @@ simpl.init();
 
 // 1. Оптимизация - стили, жс в частности simpl.init - чет каша какая-то :)
 // 2. ДИЗАЙН!
-//  2.1 Лого
+//  2.1 Лого??
 // 3. Шрифты
 // 4. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
 // 5. Сабмит по ентеру

@@ -17,7 +17,6 @@ var simpl = {
   adviserContainer: document.querySelector('#adviser-content-wrapper'),
   countdownContainer: document.querySelector('#countdown'),
   limitInputField: document.querySelector('#limit-field'),
-  endPopUp: document.querySelector('#end-pop-up'),
   rangeOutput: document.querySelector('#deadline-range-output'),
 
   // для setTimeout и setInterval
@@ -86,8 +85,7 @@ var simpl = {
           localStorage.setItem('secInPassedDays', this.secInPassedDays);
         }
         this.countdownIsOn = false;
-        this.togglePopUp(this.endPopUp);
-        this.endPopUpFill();
+        this.endCycle();
         return false;
       }
       if( ((this.deadLinePeriod * this.SEC_IN_DAY) - now) > parseInt(localStorage.secInPassedDays, 10) && now > 0 ) {
@@ -119,18 +117,11 @@ var simpl = {
     return true;
   },
 
-   // значения для списания
-  setExpensePopUpFill: function() {
-    var setExpensePopUp = document.querySelector('#setexpense-pop-up');
-    var setExpenseValueField = document.querySelector('#setexpense-value-field');
-    this.expense = parseInt(setExpenseValueField.value, 10);
-    this.limitSubtract();
-    this.togglePopUp(setExpensePopUp);
-  },
-
   // cписание средств
   limitSubtract: function() {
+    var setExpenseValueField = document.querySelector('#setexpense-value-field');
     var setExpenseNameField = document.querySelector('#setexpense-name-field');
+    this.expense = parseInt(setExpenseValueField.value, 10);
     if(Number.isInteger(this.expense) && this.expense > 0 && this.expense < 30000 && setExpenseNameField.value) {
       this.currentLimit = localStorage.currentLimit || this.initialLimit;
       this.currentLimit -= this.expense;
@@ -142,14 +133,11 @@ var simpl = {
       };
       this.addExpenseItem(expenseObj);
       this.checkColorIndicator();
-
       if(this.currentLimit < -30000) {
         this.countdownIsOn = false;
-        this.togglePopUp(this.endPopUp);
-        this.endPopUpFill();
+        this.endCycle();
         return 'Limit is exceeded';
       }
-
       return this.currentLimit;
     } else {
       this.showSystemMessage(this.systemMessages.expenseErrorTxt, this.systemMessages.messageType['error'], 10000);
@@ -203,8 +191,7 @@ var simpl = {
     this.controlsState();
     if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
       this.countdownIsOn = false;
-      this.togglePopUp(this.endPopUp);
-      this.endPopUpFill();
+      this.endCycle();
     }
     if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
@@ -233,8 +220,14 @@ var simpl = {
     this.checkColorIndicator();
   },
 
-  // сброс всего (рестарт)
-  restart: function() {
+  // конец цикла - показываем статистику
+  endCycle: function() {
+    this.togglePopUp('end-pop-up');
+    this.loadStat();
+  },
+
+  // сброс всего
+  resetAll: function() {
     this.countdownIsOn = false;
     this.controlsState();
     this.cleanAdviser();
@@ -255,7 +248,7 @@ var simpl = {
   },
 
   // вывод и наполнение финального поп-апа
-  endPopUpFill: function() {
+  loadStat: function() {
     var endVerdict = document.querySelector('#end-verdict');
     var endStat = document.querySelector('#end-stat');
     this.initialLimit = parseInt(localStorage.initialLimit, 10);
@@ -330,7 +323,12 @@ var simpl = {
   togglePopUp: function(popUpType) {
     if(this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
-      this.removePopUp(popUpType);
+      var contents = this.workingSpace.children;
+      for(var i = 0; i < contents.length; i++) {
+        if(contents[i].classList.contains('pop-up')) {
+          this.removePopUp(contents[i].id);
+        }
+      }
     } else {
       this.fillPopUp(popUpType);
       this.workingSpace.classList.add('pop-up-visible');
@@ -338,6 +336,7 @@ var simpl = {
     this.clearPopUpFields();
   },
 
+  // наполнение поп-апов
   fillPopUp: function(popUpType) {
     var popUpDiv = document.createElement('div');
     popUpDiv.classList.add('pop-up');
@@ -367,8 +366,8 @@ var simpl = {
       '<div class="pop-up__wrapper">' +
         '<p class="pop-up__p">Your progress will be lost. Continue?</p><br>' +
         '<div class="pop-up__controls">' +
-          '<button type="button" class="btn" id="restart-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>' +
-          '<button type="button" class="btn" id="restart-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>' +
+          '<button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>' +
+          '<button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>' +
         '</div>' +
       '</div>';
     }
@@ -389,12 +388,22 @@ var simpl = {
         '</div>' +
       '</div>';
     }
-
+    if(popUpType === 'end-pop-up') {
+      popUpDiv.innerHTML =
+      '<div class="pop-up__wrapper">' +
+        '<div id="end-verdict"></div>' +
+        '<div id="end-stat"></div>' +
+        '<div class="pop-up__controls">' +
+          '<button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>' +
+        '</div>' +
+      '</div>';
+    }
     this.workingSpace.appendChild(popUpDiv);
   },
 
-  removePopUp: function(popUpType) {
-    var pop = document.getElementById(popUpType);
+  // удаление поп-апов (нода)
+  removePopUp: function(id) {
+    var pop = document.getElementById(id);
     this.workingSpace.removeChild(pop);
   },
 
@@ -430,13 +439,17 @@ var simpl = {
     if(!isBtn) {
       return;
     }
-    self.togglePopUp(popUpType);
-    if(id === 'final-restart' || id === 'restart-confirm') {
-      self.restart();
+    if(id === 'final-reset' || id === 'reset-confirm') {
+      self.resetAll();
+      self.togglePopUp(popUpType);
     } else if(id === 'setlimit-submit') {
       self.setLimit();
-    } else if(id === 'restart-confirm') {
-      self.restart();
+      self.togglePopUp(popUpType);
+    } else if(id === 'setexpense-submit') {
+      self.limitSubtract();
+      self.togglePopUp(popUpType);
+    } else {
+      self.togglePopUp(popUpType);
     }
   },
 

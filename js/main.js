@@ -36,7 +36,7 @@ var simpl = {
   // установка лимита
   setLimit: function() {
     var setlimitField = document.querySelector('#setlimit-field');
-    var deadlineRange = document.querySelector('#deadline-range-field');
+    var deadlineRange = document.querySelector('#deadline-range');
     this.cleanAdviser();
     this.initialLimit = parseInt(setlimitField.value, 10);
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
@@ -351,7 +351,7 @@ var simpl = {
         '</div>' +
         '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' +
         '<div class="pop-up__field-wrapper custom-range">' +
-          '<input type="range" id="deadline-range-field" min="1" max="7" step="1" value="1">' +
+          '<input type="range" id="deadline-range" min="1" max="7" step="1" value="1">' +
         '</div>' +
         '<div class="pop-up__field-wrapper">' +
           '<span id="deadline-range-output">1</span>' +
@@ -372,6 +372,23 @@ var simpl = {
         '</div>' +
       '</div>';
     }
+    if(popUpType === 'setexpense-pop-up') {
+      popUpDiv.innerHTML =
+      '<div class="pop-up__wrapper">' +
+        '<p class="pop-up__p">Amount spent</p>' +
+        '<div class="pop-up__field-wrapper">' +
+          '<input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>' +
+        '</div>' +
+        '<p class="pop-up__p">Purchase description</p>' +
+        '<div class="pop-up__field-wrapper">' +
+          '<input type="text" class="pop-up__field" id="setexpense-name-field" value="">' +
+        '</div>' +
+        '<div class="pop-up__controls">' +
+          '<button type="button" class="btn" id="setexpense-submit">Ok</button>' +
+          '<button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    }
 
     this.workingSpace.appendChild(popUpDiv);
   },
@@ -387,8 +404,12 @@ var simpl = {
     for(var i = 0; i < popUpFields.length; i++) {
       popUpFields[i].value = '';
     }
-    //this.deadlineRange.value = 1;
-    //this.rangeOutput.innerHTML = 1;
+    // if(this.deadlineRange !== null) {
+    // обнуление слайдера
+    // }
+    // if(this.rangeOutput !== null) {
+    // 1 в поле range output
+    // }
   },
 
   // очистка поля с сообщением
@@ -404,22 +425,18 @@ var simpl = {
   btnAction: function(evt) {
     var self = simpl;
     var id = evt.target.id;
+    var isBtn = evt.target.classList.contains('btn');
     var popUpType = evt.target.dataset.popId;
-    if(id === 'end-restart' || id === 'restart-confirm') {
-      self.togglePopUp(popUpType);
+    if(!isBtn) {
+      return;
+    }
+    self.togglePopUp(popUpType);
+    if(id === 'final-restart' || id === 'restart-confirm') {
       self.restart();
     } else if(id === 'setlimit-submit') {
       self.setLimit();
-      self.togglePopUp(popUpType);
-    } else if(id === 'setlimit-cancel') {
-      self.togglePopUp(popUpType);
     } else if(id === 'restart-confirm') {
       self.restart();
-      self.togglePopUp(popUpType);
-    } else if(id === 'set-limit-btn') {
-      self.togglePopUp(popUpType);
-    } else if(id === 'reset-btn') {
-      self.togglePopUp(popUpType);
     }
   },
 

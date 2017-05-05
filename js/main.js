@@ -24,18 +24,6 @@ var simpl = {
   messageHide: this.messageHide || '',
   animateAdvise: this.animateAdvise || '',
 
-  // значения для установки лимита
-  setLimitPopUpFill: function() {
-    var setLimitPopUp = document.querySelector('#setlimit-pop-up');
-    var setlimitField = document.querySelector('#setlimit-field');
-    var deadlineRange = document.querySelector('#deadline-range-field');
-    this.initialLimit = parseInt(setlimitField.value, 10);
-    this.deadLinePeriod = parseInt(deadlineRange.value, 10);
-    this.togglePopUpView(setLimitPopUp);
-    this.removePopUp(setLimitPopUp);
-    this.setLimit();
-  },
-
   // добавление обработчиков
   addListeners: function() {
     var self = simpl;
@@ -47,7 +35,11 @@ var simpl = {
 
   // установка лимита
   setLimit: function() {
+    var setlimitField = document.querySelector('#setlimit-field');
+    var deadlineRange = document.querySelector('#deadline-range-field');
     this.cleanAdviser();
+    this.initialLimit = parseInt(setlimitField.value, 10);
+    this.deadLinePeriod = parseInt(deadlineRange.value, 10);
     if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
       return 'Invalid value';
@@ -94,7 +86,7 @@ var simpl = {
           localStorage.setItem('secInPassedDays', this.secInPassedDays);
         }
         this.countdownIsOn = false;
-        this.togglePopUpView(this.endPopUp);
+        this.togglePopUp(this.endPopUp);
         this.endPopUpFill();
         return false;
       }
@@ -133,7 +125,7 @@ var simpl = {
     var setExpenseValueField = document.querySelector('#setexpense-value-field');
     this.expense = parseInt(setExpenseValueField.value, 10);
     this.limitSubtract();
-    this.togglePopUpView(setExpensePopUp);
+    this.togglePopUp(setExpensePopUp);
   },
 
   // cписание средств
@@ -153,7 +145,7 @@ var simpl = {
 
       if(this.currentLimit < -30000) {
         this.countdownIsOn = false;
-        this.togglePopUpView(this.endPopUp);
+        this.togglePopUp(this.endPopUp);
         this.endPopUpFill();
         return 'Limit is exceeded';
       }
@@ -211,7 +203,7 @@ var simpl = {
     this.controlsState();
     if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
       this.countdownIsOn = false;
-      this.togglePopUpView(this.endPopUp);
+      this.togglePopUp(this.endPopUp);
       this.endPopUpFill();
     }
     if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
@@ -253,7 +245,6 @@ var simpl = {
     this.deadLinePeriod = '';
     this.expenseItems = [];
     this.limitInputField.value = '';
-    this.setlimitField.value = '';
     localStorage.clear();
     var popUps = document.querySelectorAll('.pop-up');
     for(var i = 0; i < popUps.length; i++) {
@@ -336,7 +327,7 @@ var simpl = {
   },
 
   // отображение поп-апов
-  togglePopUpView: function(popUpType) {
+  togglePopUp: function(popUpType) {
     if(this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
       this.removePopUp(popUpType);
@@ -356,18 +347,29 @@ var simpl = {
       '<div class="pop-up__wrapper">' +
         '<p class="pop-up__p">Set your day limit<br> 1 - 29999</p>' +
         '<div class="pop-up__field-wrapper">' +
-        '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>' +
-      '</div>' +
-      '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' +
-      '<div class="pop-up__field-wrapper custom-range">' +
-        '<input type="range" id="deadline-range-field" min="1" max="7" step="1" value="1">' +
-      '</div>' +
-      '<div class="pop-up__field-wrapper">' +
-        '<span id="deadline-range-output">1</span>' +
-      '</div>' +
-      '<div class="pop-up__controls">' +
-        '<button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>' +
-        '<button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>' +
+          '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>' +
+        '</div>' +
+        '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' +
+        '<div class="pop-up__field-wrapper custom-range">' +
+          '<input type="range" id="deadline-range-field" min="1" max="7" step="1" value="1">' +
+        '</div>' +
+        '<div class="pop-up__field-wrapper">' +
+          '<span id="deadline-range-output">1</span>' +
+        '</div>' +
+        '<div class="pop-up__controls">' +
+          '<button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>' +
+          '<button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    }
+    if(popUpType === 'rest-confirm-pop-up') {
+      popUpDiv.innerHTML =
+      '<div class="pop-up__wrapper">' +
+        '<p class="pop-up__p">Your progress will be lost. Continue?</p><br>' +
+        '<div class="pop-up__controls">' +
+          '<button type="button" class="btn" id="restart-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>' +
+          '<button type="button" class="btn" id="restart-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>' +
+        '</div>' +
       '</div>';
     }
 
@@ -375,8 +377,8 @@ var simpl = {
   },
 
   removePopUp: function(popUpType) {
-    var removed = document.getElementById(popUpType);
-    this.workingSpace.removeChild(removed);
+    var pop = document.getElementById(popUpType);
+    this.workingSpace.removeChild(pop);
   },
 
   // очистка полей поп-апов
@@ -404,12 +406,20 @@ var simpl = {
     var id = evt.target.id;
     var popUpType = evt.target.dataset.popId;
     if(id === 'end-restart' || id === 'restart-confirm') {
-      self.togglePopUpView(popUpType);
+      self.togglePopUp(popUpType);
       self.restart();
     } else if(id === 'setlimit-submit') {
-      self.setLimitPopUpFill();
-    } else {
-      self.togglePopUpView(popUpType);
+      self.setLimit();
+      self.togglePopUp(popUpType);
+    } else if(id === 'setlimit-cancel') {
+      self.togglePopUp(popUpType);
+    } else if(id === 'restart-confirm') {
+      self.restart();
+      self.togglePopUp(popUpType);
+    } else if(id === 'set-limit-btn') {
+      self.togglePopUp(popUpType);
+    } else if(id === 'reset-btn') {
+      self.togglePopUp(popUpType);
     }
   },
 

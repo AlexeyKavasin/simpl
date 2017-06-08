@@ -4,6 +4,7 @@ var simpl = {
   SEC_IN_DAY: 86400,
   secInPassedDays: 86400,
   countdownIsOn: this.countdownIsOn || false,
+  cycleEnded: this.cycleEnded || false,
   expense: 0,
   initialLimit: localStorage.initialLimit || this.initialLimit || '',
   currentLimit: localStorage.currentLimit || this.currentLimit || '',
@@ -17,7 +18,6 @@ var simpl = {
   adviserContainer: document.querySelector('#adviser-content-wrapper'),
   countdownContainer: document.querySelector('#countdown'),
   limitInputField: document.querySelector('#limit-field'),
-  rangeOutput: document.querySelector('#deadline-range-output'),
 
   // для setTimeout и setInterval
   messageHide: this.messageHide || '',
@@ -26,9 +26,6 @@ var simpl = {
   // добавление обработчиков
   addListeners: function() {
     var self = simpl;
-    // self.deadlineRange.addEventListener('input', function() {
-    //   self.rangeOutput.innerHTML = self.deadlineRange.value;
-    // });
     self.workingSpace.addEventListener('click', self.btnAction);
   },
 
@@ -85,7 +82,9 @@ var simpl = {
           localStorage.setItem('secInPassedDays', this.secInPassedDays);
         }
         this.countdownIsOn = false;
+        this.cycleEnded = true;
         this.endCycle();
+        this.countdownContainer.style.display = '';
         return false;
       }
       if( ((this.deadLinePeriod * this.SEC_IN_DAY) - now) > parseInt(localStorage.secInPassedDays, 10) && now > 0 ) {
@@ -135,7 +134,7 @@ var simpl = {
       this.checkColorIndicator();
       if(this.currentLimit < -30000) {
         this.countdownIsOn = false;
-        this.endCycle();
+        this.cycleEnded = true;
         return 'Limit is exceeded';
       }
       return this.currentLimit;
@@ -189,10 +188,6 @@ var simpl = {
   init: function() {
     this.addListeners();
     this.controlsState();
-    if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
-      this.countdownIsOn = false;
-      this.endCycle();
-    }
     if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
       this.endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
@@ -209,6 +204,11 @@ var simpl = {
         this.countdownContainer.style.display = 'block';
       }.bind(this), 1000);
     }
+    if(localStorage.currentLimit && localStorage.currentLimit < -30000) {
+      this.countdownIsOn = false;
+      this.cycleEnded = true;
+      this.endCycle();
+    }
   },
 
   // обновление текущего лимита раз в сутки
@@ -222,13 +222,26 @@ var simpl = {
 
   // конец цикла - показываем статистику
   endCycle: function() {
-    this.togglePopUp('end-pop-up');
+    this.clearPopUpFields();
+    var endDiv = document.createElement('div');
+    endDiv.classList.add('pop-up');
+    endDiv.innerHTML =
+    '<div class="pop-up__wrapper">' +
+      '<div id="end-verdict"></div>' +
+      '<div id="end-stat"></div>' +
+      '<div class="pop-up__controls">' +
+        '<button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>' +
+      '</div>' +
+    '</div>';
+    this.workingSpace.appendChild(endDiv);
+    this.workingSpace.classList.add('pop-up-visible');
     this.loadStat();
   },
 
   // сброс всего
   resetAll: function() {
     this.countdownIsOn = false;
+    this.cycleEnded = false;
     this.controlsState();
     this.cleanAdviser();
     this.initialLimit = '';
@@ -256,14 +269,14 @@ var simpl = {
     this.deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
     this.limitInputField.value = this.currentLimit;
     if(!this.currentLimit || this.currentLimit > -30000) {
-      endVerdict.innerHTML = '<p>Time is up</p><br>';
+      endVerdict.innerHTML = '<p>Time is up</p>';
     } else {
-      endVerdict.innerHTML = '<p>Purchase limit exceeded</p><br>';
+      endVerdict.innerHTML = '<p>Purchase limit exceeded</p>';
     }
     if(!this.currentLimit || this.currentLimit === this.initialLimit * this.deadLinePeriod) {
       endStat.innerHTML =
       '<p>Day limit: ' + this.initialLimit + '</p>' +
-      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
+      '<p>Period (days): ' + this.deadLinePeriod + '</p>' + //посчитать количество прошедших (secInPassedDays) если оно не совпадает с изначально заданным
       '<p>Spent: 0</p>' +
       '<p>Saved: ' + this.initialLimit + '</p>' +
       '<p>Probably you did it wrong or didn\'t write down your purchases. Try again.</p>';
@@ -320,24 +333,29 @@ var simpl = {
   },
 
   // отображение поп-апов
-  togglePopUp: function(popUpType) {
+  togglePopUp: function(popUpType, fn) {
+    this.clearPopUpFields();
     if(this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
       var contents = this.workingSpace.children;
-      for(var i = 0; i < contents.length; i++) {
-        if(contents[i].classList.contains('pop-up')) {
-          this.removePopUp(contents[i].id);
+      if(contents.length) {
+        for(var i = 0; i < contents.length; i++) {
+          if(contents[i].classList.contains('pop-up')) {
+            this.workingSpace.removeChild(contents[i]);
+          }
         }
       }
     } else {
-      this.fillPopUp(popUpType);
+      this.fillPopUp(popUpType, fn);
       this.workingSpace.classList.add('pop-up-visible');
     }
-    this.clearPopUpFields();
+    if(this.cycleEnded) {
+      this.endCycle();
+    }
   },
 
   // наполнение поп-апов
-  fillPopUp: function(popUpType) {
+  fillPopUp: function(popUpType, fn) {
     var popUpDiv = document.createElement('div');
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
@@ -353,7 +371,7 @@ var simpl = {
           '<input type="range" id="deadline-range" min="1" max="7" step="1" value="1">' +
         '</div>' +
         '<div class="pop-up__field-wrapper">' +
-          '<span id="deadline-range-output">1</span>' +
+          '<input type="text" class="pop-up__field" id="deadline-range-output" value="1">' +
         '</div>' +
         '<div class="pop-up__controls">' +
           '<button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>' +
@@ -380,7 +398,7 @@ var simpl = {
         '</div>' +
         '<p class="pop-up__p">Purchase description</p>' +
         '<div class="pop-up__field-wrapper">' +
-          '<input type="text" class="pop-up__field" id="setexpense-name-field" value="">' +
+          '<input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">' +
         '</div>' +
         '<div class="pop-up__controls">' +
           '<button type="button" class="btn" id="setexpense-submit">Ok</button>' +
@@ -388,23 +406,10 @@ var simpl = {
         '</div>' +
       '</div>';
     }
-    if(popUpType === 'end-pop-up') {
-      popUpDiv.innerHTML =
-      '<div class="pop-up__wrapper">' +
-        '<div id="end-verdict"></div>' +
-        '<div id="end-stat"></div>' +
-        '<div class="pop-up__controls">' +
-          '<button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>' +
-        '</div>' +
-      '</div>';
-    }
     this.workingSpace.appendChild(popUpDiv);
-  },
-
-  // удаление поп-апов (нода)
-  removePopUp: function(id) {
-    var pop = document.getElementById(id);
-    this.workingSpace.removeChild(pop);
+    if(fn) {
+      fn();
+    }
   },
 
   // очистка полей поп-апов
@@ -413,12 +418,6 @@ var simpl = {
     for(var i = 0; i < popUpFields.length; i++) {
       popUpFields[i].value = '';
     }
-    // if(this.deadlineRange !== null) {
-    // обнуление слайдера
-    // }
-    // if(this.rangeOutput !== null) {
-    // 1 в поле range output
-    // }
   },
 
   // очистка поля с сообщением
@@ -447,7 +446,17 @@ var simpl = {
       self.togglePopUp(popUpType);
     } else if(id === 'setexpense-submit') {
       self.limitSubtract();
-      self.togglePopUp(popUpType);
+      if(!this.cycleEnded) {
+        self.togglePopUp(popUpType);
+      }
+    } else if(id === 'set-limit-btn') {
+      self.togglePopUp(popUpType, function() {
+        var rangeSlider = document.querySelector('#deadline-range');
+        var rangeOutput = document.querySelector('#deadline-range-output');
+        rangeSlider.addEventListener('input', function() {
+          rangeOutput.value = rangeSlider.value;
+        });
+      });
     } else {
       self.togglePopUp(popUpType);
     }
@@ -486,21 +495,3 @@ var simpl = {
 };
 
 simpl.init();
-
-// Цели
-
-// 1. Оптимизация - стили, жс в частности simpl.init - чет каша какая-то :)
-// 2. ДИЗАЙН!
-//  2.1 Лого??
-// 3. Шрифты
-// 4. Подумать над поп-апами. Возможно правильнее сделать один и наполнять его разным контентом.
-// 5. Сабмит по ентеру
-// 6. Ограничить длину строки "описание покупки"
-// 7. Переписать под ES6, прикрутить babel
-
-// Баги
-
-// 1. На телефоне при фокусе в поле суммы, футер поднимается вверх (установил минимальную высоту для боди) ✔
-// 2. Сбрасывать состояние range при выходе из поп-апа установки лимита ✔
-// 3. Ошибки с forEach в FF (btns.forEach; popUpFields) (заменил на обычные циклы) ✔
-// 4. .main флексит весь контент по центру. Без покупок смотрится не очень, ибо покупки при добавлении толкают кнопки наверх (минимальная высота для блока с подсказками) ✔

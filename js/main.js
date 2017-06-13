@@ -13,23 +13,23 @@ var simpl = {
   endDeadLine: localStorage.endDeadLine || this.endDeadLine || '',
   expenseItems: localStorage.expenseItems || this.expenseItems || [],
 
-  // DOM элементы
+  // DOM elements
   workingSpace: document.querySelector('#main'),
   adviserContainer: document.querySelector('#adviser-content-wrapper'),
   countdownContainer: document.querySelector('#countdown'),
   limitInputField: document.querySelector('#limit-field'),
 
-  // для setTimeout и setInterval
+  // timers for message animation
   messageHide: this.messageHide || '',
   animateAdvise: this.animateAdvise || '',
 
-  // добавление обработчиков
+  // adding listeners
   addListeners: function() {
     var self = simpl;
     self.workingSpace.addEventListener('click', self.btnAction);
   },
 
-  // установка лимита
+  // setting limit
   setLimit: function() {
     var setlimitField = document.querySelector('#setlimit-field');
     var deadlineRange = document.querySelector('#deadline-range');
@@ -54,7 +54,7 @@ var simpl = {
     return this.initialLimit;
   },
 
-  // установка таймера
+  // setting timer
   setInitialTimer: function() {
     this.startDeadLine = new Date();
     this.endDeadLine = new Date();
@@ -65,7 +65,7 @@ var simpl = {
     this.countdownIsOn = true;
   },
 
-  // запуск и работа таймера
+  // timer working
   countdownWork: function() {
     if(!this.countdownIsOn) {
       this.countdownContainer.innerHTML = '';
@@ -73,9 +73,10 @@ var simpl = {
       var now = new Date();
       now = Math.floor((this.endDeadLine - now) / 1000);
       if(now <= 0) {
-        // до тех пор пока текущее прошедшее время меньше установленного срока
-        // и сумма текущего и первоначального лимита не превышает максимально возможной на балансе суммы
-        // обновляем баланс на сумму первоначального лимита
+        // additional checking
+        // while current passed time is less than deadline period
+        // and current limit += initial limit is less than maximum available sum
+        // renew balance
         while( parseInt(localStorage.secInPassedDays, 10) < (this.deadLinePeriod * this.SEC_IN_DAY) &&
           parseInt(localStorage.currentLimit, 10) + parseInt(localStorage.initialLimit, 10) < parseInt(localStorage.initialLimit, 10) * this.deadLinePeriod ) {
           this.renewLimit(parseInt(localStorage.initialLimit, 10));
@@ -116,7 +117,7 @@ var simpl = {
     return true;
   },
 
-  // cписание средств
+  // subtract
   limitSubtract: function() {
     var setExpenseValueField = document.querySelector('#setexpense-value-field');
     var setExpenseNameField = document.querySelector('#setexpense-name-field');
@@ -144,7 +145,7 @@ var simpl = {
     }
   },
 
-  // добавление в список покупок
+  // adding expense items in a list
   addExpenseItem: function(item) {
     if(localStorage.expenseItems) {
       this.expenseItems = JSON.parse(localStorage.expenseItems);
@@ -161,7 +162,7 @@ var simpl = {
     this.showExpenseList();
   },
 
-  // отображение списка покупок
+  // showing expense list
   showExpenseList: function() {
     this.cleanAdviser();
     var isEmpty = true;
@@ -184,7 +185,7 @@ var simpl = {
     }
   },
 
-  // запуск приложения
+  // simpl initialize
   init: function() {
     this.addListeners();
     this.controlsState();
@@ -211,7 +212,7 @@ var simpl = {
     }
   },
 
-  // обновление текущего лимита раз в сутки
+  // renewing limit
   renewLimit: function(sum) {
     this.currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
     this.currentLimit += sum;
@@ -220,7 +221,7 @@ var simpl = {
     this.checkColorIndicator();
   },
 
-  // конец цикла - показываем статистику
+  // end of cycle
   endCycle: function() {
     this.clearPopUpFields();
     var endDiv = document.createElement('div');
@@ -238,7 +239,7 @@ var simpl = {
     this.loadStat();
   },
 
-  // сброс всего
+  // reset all
   resetAll: function() {
     this.countdownIsOn = false;
     this.cycleEnded = false;
@@ -260,7 +261,7 @@ var simpl = {
     this.checkColorIndicator();
   },
 
-  // вывод и наполнение финального поп-апа
+  // loading stats
   loadStat: function() {
     var endVerdict = document.querySelector('#end-verdict');
     var endStat = document.querySelector('#end-stat');
@@ -297,7 +298,7 @@ var simpl = {
     }
   },
 
-  // индикатор отрицательного баланса
+  // show indicator if negative balance
   checkColorIndicator: function() {
     if(parseInt(localStorage.currentLimit, 10) < 0) {
       this.limitInputField.classList.add('negative-balance');
@@ -306,11 +307,11 @@ var simpl = {
     }
   },
 
-  // состояние кнопок
+  // state of buttons - active / inactive
   controlsState: function() {
     var btns = document.querySelectorAll('.btn');
     if(this.countdownIsOn) {
-      // приложение запущено
+      // app in progress
       document.body.classList.add('in-process');
       for(var i = 0; i < btns.length; i++) {
         if(btns[i].classList.contains('init-load-btn')) {
@@ -320,7 +321,7 @@ var simpl = {
         }
       }
     } else {
-      // первоначальное состояние
+      // app is stopped
       document.body.classList.remove('in-process');
       for(i = 0; i < btns.length; i++) {
         if(btns[i].classList.contains('in-process-btn')) {
@@ -332,7 +333,7 @@ var simpl = {
     }
   },
 
-  // отображение поп-апов
+  // pop-up toggling
   togglePopUp: function(popUpType, fn) {
     this.clearPopUpFields();
     if(this.workingSpace.classList.contains('pop-up-visible')) {
@@ -354,7 +355,7 @@ var simpl = {
     }
   },
 
-  // наполнение поп-апов
+  // pop-up filling with content
   fillPopUp: function(popUpType, fn) {
     var popUpDiv = document.createElement('div');
     popUpDiv.classList.add('pop-up');
@@ -412,7 +413,7 @@ var simpl = {
     }
   },
 
-  // очистка полей поп-апов
+  // clearing pop-up fields
   clearPopUpFields: function() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
     for(var i = 0; i < popUpFields.length; i++) {
@@ -420,7 +421,7 @@ var simpl = {
     }
   },
 
-  // очистка поля с сообщением
+  // clearing adviser field
   cleanAdviser: function() {
     clearInterval(this.animateAdvise);
     clearTimeout(this.messageHide);
@@ -429,7 +430,7 @@ var simpl = {
     this.adviserContainer.classList.add('adviser__wrapper');
   },
 
-  // действия для управляющих элементов
+  // actions for control elements
   btnAction: function(evt) {
     var self = simpl;
     var id = evt.target.id;
@@ -462,7 +463,7 @@ var simpl = {
     }
   },
 
-  // вывод системных сообщений
+  // showing system messages
   showSystemMessage: function(systemMessageText, messageType, expandTime) {
     var i = 0;
     var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
@@ -483,7 +484,7 @@ var simpl = {
     }.bind(this), expandTime = expandTime || 5000);
   },
 
-  // объект с сообщениями
+  // messages object
   systemMessages: {
     expenseErrorTxt: 'Invalid value. Valid purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
     limitErrorTxt: 'Invalid value. Valid limit: 1 to 29999. Valid period: 1 - 7 days ',

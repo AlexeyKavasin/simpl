@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  // min-height: calc(100vh - 122px);
+  min-height: calc(100vh - 122px);
   @include mobile-and-beyond {
     align-items: flex-start;
     padding-top: 30px;

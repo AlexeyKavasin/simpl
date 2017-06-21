@@ -187,16 +187,6 @@ var simpl = {
 
   // simpl initialize
   init: function() {
-    if( navigator.userAgent.match(/Android/i)
-    || navigator.userAgent.match(/webOS/i)
-    || navigator.userAgent.match(/iPhone/i)
-    || navigator.userAgent.match(/iPad/i)
-    || navigator.userAgent.match(/iPod/i)
-    || navigator.userAgent.match(/BlackBerry/i)
-    || navigator.userAgent.match(/Windows Phone/i)
-    ) {
-      window.screen.orientation.lock('portrait-primary');
-    }
     this.addListeners();
     this.controlsState();
     if(localStorage.length) { // рабочее состояние - в локал сторож есть данные

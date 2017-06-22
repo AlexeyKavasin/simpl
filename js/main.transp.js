@@ -29,6 +29,7 @@ var simpl = {
     self.workingSpace.addEventListener('click', self.btnAction);
   },
 
+
   // setting limit
   setLimit: function setLimit() {
     var setlimitField = document.querySelector('#setlimit-field');
@@ -38,7 +39,7 @@ var simpl = {
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
     if (this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
-      return 'Invalid value';
+      return false;
     }
     this.limitInputField.value = this.initialLimit;
     localStorage.setItem('initialLimit', this.initialLimit);
@@ -54,6 +55,7 @@ var simpl = {
     return this.initialLimit;
   },
 
+
   // setting timer
   setInitialTimer: function setInitialTimer() {
     this.startDeadLine = new Date();
@@ -64,6 +66,7 @@ var simpl = {
     localStorage.setItem('deadLinePeriod', this.deadLinePeriod);
     this.countdownIsOn = true;
   },
+
 
   // timer working
   countdownWork: function countdownWork() {
@@ -116,6 +119,7 @@ var simpl = {
     return true;
   },
 
+
   // subtract
   limitSubtract: function limitSubtract() {
     var setExpenseValueField = document.querySelector('#setexpense-value-field');
@@ -144,6 +148,7 @@ var simpl = {
     }
   },
 
+
   // adding expense items in a list
   addExpenseItem: function addExpenseItem(item) {
     if (localStorage.expenseItems) {
@@ -160,6 +165,7 @@ var simpl = {
     localStorage.setItem('expenseItems', JSON.stringify(this.expenseItems));
     this.showExpenseList();
   },
+
 
   // showing expense list
   showExpenseList: function showExpenseList() {
@@ -183,6 +189,7 @@ var simpl = {
       }
     }
   },
+
 
   // simpl initialize
   init: function init() {
@@ -212,6 +219,7 @@ var simpl = {
     }
   },
 
+
   // renewing limit
   renewLimit: function renewLimit(sum) {
     this.currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
@@ -220,6 +228,7 @@ var simpl = {
     localStorage.setItem('currentLimit', this.currentLimit);
     this.checkColorIndicator();
   },
+
 
   // end of cycle
   endCycle: function endCycle() {
@@ -231,6 +240,7 @@ var simpl = {
     this.workingSpace.classList.add('pop-up-visible');
     this.loadStat();
   },
+
 
   // reset all
   resetAll: function resetAll() {
@@ -254,6 +264,7 @@ var simpl = {
     this.checkColorIndicator();
   },
 
+
   // loading stats
   loadStat: function loadStat() {
     var endVerdict = document.querySelector('#end-verdict');
@@ -276,6 +287,7 @@ var simpl = {
     }
   },
 
+
   // show indicator if negative balance
   checkColorIndicator: function checkColorIndicator() {
     if (parseInt(localStorage.currentLimit, 10) < 0) {
@@ -284,6 +296,7 @@ var simpl = {
       this.limitInputField.classList.remove('negative-balance');
     }
   },
+
 
   // state of buttons - active / inactive
   controlsState: function controlsState() {
@@ -311,6 +324,7 @@ var simpl = {
     }
   },
 
+
   // pop-up toggling
   togglePopUp: function togglePopUp(popUpType, fn) {
     this.clearPopUpFields();
@@ -333,6 +347,7 @@ var simpl = {
     }
   },
 
+
   // pop-up filling with content
   fillPopUp: function fillPopUp(popUpType, fn) {
     var popUpDiv = document.createElement('div');
@@ -353,13 +368,15 @@ var simpl = {
     }
   },
 
+
   // clearing pop-up fields
   clearPopUpFields: function clearPopUpFields() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
     popUpFields.forEach(function (p) {
-      p.value = '';
+      return p.value = '';
     });
   },
+
 
   // clearing adviser field
   cleanAdviser: function cleanAdviser() {
@@ -369,6 +386,7 @@ var simpl = {
     this.adviserContainer.className = '';
     this.adviserContainer.classList.add('adviser__wrapper');
   },
+
 
   // actions for control elements
   btnAction: function btnAction(evt) {
@@ -395,13 +413,14 @@ var simpl = {
         var rangeSlider = document.querySelector('#deadline-range');
         var rangeOutput = document.querySelector('#deadline-range-output');
         rangeSlider.addEventListener('input', function () {
-          return rangeOutput.value = rangeSlider.value;
+          rangeOutput.value = rangeSlider.value;
         });
       });
     } else {
       self.togglePopUp(popUpType);
     }
   },
+
 
   // showing system messages
   showSystemMessage: function showSystemMessage(systemMessageText, messageType, expandTime) {
@@ -423,6 +442,7 @@ var simpl = {
       this.showExpenseList();
     }.bind(this), expandTime = 5000);
   },
+
 
   // messages object
   systemMessages: {

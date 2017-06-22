@@ -24,13 +24,13 @@ var simpl = {
   animateAdvise: this.animateAdvise || '',
 
   // adding listeners
-  addListeners: function() {
+  addListeners() {
     var self = simpl;
     self.workingSpace.addEventListener('click', self.btnAction);
   },
 
   // setting limit
-  setLimit: function() {
+  setLimit() {
     var setlimitField = document.querySelector('#setlimit-field');
     var deadlineRange = document.querySelector('#deadline-range');
     this.cleanAdviser();
@@ -38,7 +38,7 @@ var simpl = {
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
     if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
-      return 'Invalid value';
+      return false;
     }
     this.limitInputField.value = this.initialLimit;
     localStorage.setItem('initialLimit', this.initialLimit);
@@ -55,7 +55,7 @@ var simpl = {
   },
 
   // setting timer
-  setInitialTimer: function() {
+  setInitialTimer() {
     this.startDeadLine = new Date();
     this.endDeadLine = new Date();
     this.endDeadLine.setDate(this.startDeadLine.getDate() + this.deadLinePeriod);
@@ -66,7 +66,7 @@ var simpl = {
   },
 
   // timer working
-  countdownWork: function() {
+  countdownWork() {
     if(!this.countdownIsOn) {
       this.countdownContainer.innerHTML = '';
     } else {
@@ -118,7 +118,7 @@ var simpl = {
   },
 
   // subtract
-  limitSubtract: function() {
+  limitSubtract() {
     var setExpenseValueField = document.querySelector('#setexpense-value-field');
     var setExpenseNameField = document.querySelector('#setexpense-name-field');
     this.expense = parseInt(setExpenseValueField.value, 10);
@@ -146,7 +146,7 @@ var simpl = {
   },
 
   // adding expense items in a list
-  addExpenseItem: function(item) {
+  addExpenseItem(item) {
     if(localStorage.expenseItems) {
       this.expenseItems = JSON.parse(localStorage.expenseItems);
     }
@@ -163,7 +163,7 @@ var simpl = {
   },
 
   // showing expense list
-  showExpenseList: function() {
+  showExpenseList() {
     this.cleanAdviser();
     var isEmpty = true;
     if(localStorage.expenseItems) {
@@ -186,7 +186,7 @@ var simpl = {
   },
 
   // simpl initialize
-  init: function() {
+  init() {
     this.addListeners();
     this.controlsState();
     if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
@@ -213,7 +213,7 @@ var simpl = {
   },
 
   // renewing limit
-  renewLimit: function(sum) {
+  renewLimit(sum) {
     this.currentLimit = parseInt(localStorage.currentLimit, 10) || parseInt(localStorage.initialLimit, 10);
     this.currentLimit += sum;
     this.limitInputField.value = this.currentLimit;
@@ -222,7 +222,7 @@ var simpl = {
   },
 
   // end of cycle
-  endCycle: function() {
+  endCycle() {
     this.clearPopUpFields();
     var endDiv = document.createElement('div');
     endDiv.classList.add('pop-up');
@@ -240,7 +240,7 @@ var simpl = {
   },
 
   // reset all
-  resetAll: function() {
+  resetAll() {
     this.countdownIsOn = false;
     this.cycleEnded = false;
     this.controlsState();
@@ -260,7 +260,7 @@ var simpl = {
   },
 
   // loading stats
-  loadStat: function() {
+  loadStat() {
     var endVerdict = document.querySelector('#end-verdict');
     var endStat = document.querySelector('#end-stat');
     this.initialLimit = parseInt(localStorage.initialLimit, 10);
@@ -297,7 +297,7 @@ var simpl = {
   },
 
   // show indicator if negative balance
-  checkColorIndicator: function() {
+  checkColorIndicator() {
     if(parseInt(localStorage.currentLimit, 10) < 0) {
       this.limitInputField.classList.add('negative-balance');
     } else {
@@ -306,7 +306,7 @@ var simpl = {
   },
 
   // state of buttons - active / inactive
-  controlsState: function() {
+  controlsState() {
     var btns = document.querySelectorAll('.btn');
     if(this.countdownIsOn) {
       // app in progress
@@ -332,7 +332,7 @@ var simpl = {
   },
 
   // pop-up toggling
-  togglePopUp: function(popUpType, fn) {
+  togglePopUp(popUpType, fn) {
     this.clearPopUpFields();
     if(this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
@@ -354,7 +354,7 @@ var simpl = {
   },
 
   // pop-up filling with content
-  fillPopUp: function(popUpType, fn) {
+  fillPopUp(popUpType, fn) {
     var popUpDiv = document.createElement('div');
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
@@ -412,13 +412,13 @@ var simpl = {
   },
 
   // clearing pop-up fields
-  clearPopUpFields: function() {
+  clearPopUpFields() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
-    popUpFields.forEach((p) => { p.value = '' });
+    popUpFields.forEach(p => p.value = '');
   },
 
   // clearing adviser field
-  cleanAdviser: function() {
+  cleanAdviser() {
     clearInterval(this.animateAdvise);
     clearTimeout(this.messageHide);
     this.adviserContainer.innerHTML = '';
@@ -427,7 +427,7 @@ var simpl = {
   },
 
   // actions for control elements
-  btnAction: function(evt) {
+  btnAction(evt) {
     var self = simpl;
     var id = evt.target.id;
     var isBtn = evt.target.classList.contains('btn');
@@ -450,7 +450,9 @@ var simpl = {
       self.togglePopUp(popUpType, function() {
         var rangeSlider = document.querySelector('#deadline-range');
         var rangeOutput = document.querySelector('#deadline-range-output');
-        rangeSlider.addEventListener('input', () => rangeOutput.value = rangeSlider.value);
+        rangeSlider.addEventListener('input', function() {
+          rangeOutput.value = rangeSlider.value  
+        });
       });
     } else {
       self.togglePopUp(popUpType);
@@ -458,10 +460,10 @@ var simpl = {
   },
 
   // showing system messages
-  showSystemMessage: function(systemMessageText, messageType, expandTime) {
-    var i = 0;
-    var blinkingCursor = `<span class="blinking-cursor">&nbsp;</span>`;
-    var speed = 30;
+  showSystemMessage(systemMessageText, messageType, expandTime) {
+    let i = 0;
+    let blinkingCursor = `<span class="blinking-cursor">&nbsp;</span>`;
+    let speed = 30;
     this.cleanAdviser();
     this.animateAdvise = setInterval(function() {
       this.adviserContainer.innerHTML += systemMessageText[i];

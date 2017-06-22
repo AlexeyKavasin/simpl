@@ -14,6 +14,7 @@ var rename = require('gulp-rename');
 var imagemin = require('gulp-imagemin');
 var run = require('run-sequence');
 var del = require('del');
+var babel = require('gulp-babel');
 
 gulp.task('clean', function() {
   return del('build');
@@ -50,9 +51,16 @@ gulp.task('style', function() {
     .pipe(server.stream());
 });
 
+gulp.task('babelify', function() {
+  return gulp.src('js/main.js')
+    .pipe(rename('main.transp.js'))
+    .pipe(babel())
+    .pipe(gulp.dest('js'));
+});
+
 gulp.task('compress', function(fn) {
   pump([
-    gulp.src('js/main.js'),
+    gulp.src('js/main.transp.js'),
     rename('main.min.js'),
     uglify(),
     gulp.dest('js')
@@ -83,5 +91,5 @@ gulp.task('serve', function() {
 });
 
 gulp.task('build', function(fn) {
-  run('clean', 'copy', 'style', 'images', 'compress', fn);
+  run('clean', 'copy', 'style', 'images', 'babelify', 'compress', fn);
 });

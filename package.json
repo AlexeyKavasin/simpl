@@ -6,11 +6,15 @@
   "devDependencies": {
     "@htmlacademy/editorconfig-cli": "0.1.x",
     "autoprefixer": "6.5.3",
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.5.2",
+    "babel-preset-es2015-script": "^1.1.0",
     "browser-sync": "2.18.2",
     "css-mqpacker": "^5.0.1",
     "del": "^2.2.2",
     "eslint": "^3.2.0",
     "gulp": "3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-csso": "^2.0.0",
     "gulp-imagemin": "^3.1.1",
     "gulp-plumber": "1.1.0",
@@ -36,5 +40,10 @@
   ],
   "engines": {
     "node": "6.7"
+  },
+  "babel": {
+    "presets": [
+      "es2015-script"
+    ]
   }
 }

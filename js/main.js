@@ -109,7 +109,7 @@ var simpl = {
       if(thour < 10) {
         thour = '0' + thour;
       }
-      this.countdownContainer.innerHTML = thour + ':' + tmin + ':' + tsec;
+      this.countdownContainer.innerHTML = `${thour}:${tmin}:${tsec}`;
       setTimeout(function() {
         this.countdownWork();
       }.bind(this), 1000);
@@ -174,8 +174,8 @@ var simpl = {
       var expenseList = document.createElement('ul');
       expenseList.classList.add('expense-list');
       this.adviserContainer.appendChild(expenseList);
-      expenseList.innerHTML = this.expenseItems.map(function(i) {
-        return '<li class="expense-list__item">' + i.name + '<span class="expense-list__cash">' + i.price + '</span>' + '</li>';
+      expenseList.innerHTML = this.expenseItems.map((i) => {
+        return `<li class="expense-list__item">${i.name}<span class="expense-list__cash">${i.price}</span></li>`;
       }).join('');
       var listItems = document.querySelectorAll('.expense-list__item');
       var defaultPadding = 12;
@@ -274,25 +274,25 @@ var simpl = {
     }
     if(!this.currentLimit || this.currentLimit === this.initialLimit * this.deadLinePeriod) {
       endStat.innerHTML =
-      '<p>Day limit: ' + this.initialLimit + '</p>' +
-      '<p>Period (days): ' + this.deadLinePeriod + '</p>' + //посчитать количество прошедших (secInPassedDays) если оно не совпадает с изначально заданным
-      '<p>Spent: 0</p>' +
-      '<p>Saved: ' + this.initialLimit + '</p>' +
-      '<p>Probably you did it wrong or didn\'t write down your purchases. Try again.</p>';
+      `<p>Day limit: ${this.initialLimit}</p>
+      <p>Period (days): ${this.deadLinePeriod}</p> //посчитать количество прошедших (secInPassedDays) если оно не совпадает с изначально заданным
+      <p>Spent: 0</p>
+      <p>Saved: ${this.initialLimit}</p>
+      <p>Probably you did it wrong or didn&#39;t write down your purchases. Try again.</p>`;
     } else if(this.currentLimit < 0) {
       endStat.innerHTML =
-      '<p>Day limit: ' + this.initialLimit + '</p>' +
-      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
-      '<p>Spent: ' + ((this.initialLimit * this.deadLinePeriod) + Math.abs(this.currentLimit)) + '</p>' +
-      '<p>Overspent: ' + Math.abs(this.currentLimit) + '</p>' +
-      '<p>Try again.</p>';
+      `<p>Day limit: ${this.initialLimit}</p>
+      <p>Period (days): ${this.deadLinePeriod}</p>
+      <p>Spent: ${((this.initialLimit * this.deadLinePeriod) + Math.abs(this.currentLimit))}</p>
+      <p>Overspent: ${Math.abs(this.currentLimit)}</p>
+      <p>Try again.</p>`;
     } else {
       endStat.innerHTML =
-      '<p>Day limit: ' + this.initialLimit + '</p>' +
-      '<p>Period (days): ' + this.deadLinePeriod + '</p>' +
-      '<p>Spent: ' + ((this.initialLimit * this.deadLinePeriod) - this.currentLimit) + '</p>' +
-      '<p>Saved: ' + this.currentLimit + '</p>' +
-      '<p>Try again.</p>';
+      `<p>Day limit: ${this.initialLimit}</p>
+      <p>Period (days): ${this.deadLinePeriod}</p>
+      <p>Spent: ${((this.initialLimit * this.deadLinePeriod) - this.currentLimit)}</p>
+      <p>Saved: ${this.currentLimit}</p>
+      <p>Try again.</p>`;
     }
   },
 
@@ -479,7 +479,7 @@ var simpl = {
     this.messageHide = setTimeout(function() {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = expandTime || 5000);
+    }.bind(this), expandTime = 5000);
   },
 
   // messages object

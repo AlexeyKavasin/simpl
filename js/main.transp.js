@@ -174,7 +174,7 @@ var simpl = {
       expenseList.classList.add('expense-list');
       this.adviserContainer.appendChild(expenseList);
       expenseList.innerHTML = this.expenseItems.map(function (i) {
-        return '<li class="expense-list__item">' + i.name + '<span class="expense-list__cash">' + i.price + '</span>' + '</li>';
+        return '<li class="expense-list__item">' + i.name + '<span class="expense-list__cash">' + i.price + '</span></li>';
       }).join('');
       var listItems = document.querySelectorAll('.expense-list__item');
       var defaultPadding = 12;
@@ -268,12 +268,11 @@ var simpl = {
       endVerdict.innerHTML = '<p>Purchase limit exceeded</p>';
     }
     if (!this.currentLimit || this.currentLimit === this.initialLimit * this.deadLinePeriod) {
-      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>' + '<p>Period (days): ' + this.deadLinePeriod + '</p>' + //посчитать количество прошедших (secInPassedDays) если оно не совпадает с изначально заданным
-      '<p>Spent: 0</p>' + '<p>Saved: ' + this.initialLimit + '</p>' + '<p>Probably you did it wrong or didn\'t write down your purchases. Try again.</p>';
+      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>\n      <p>Period (days): ' + this.deadLinePeriod + '</p> //\u043F\u043E\u0441\u0447\u0438\u0442\u0430\u0442\u044C \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u043F\u0440\u043E\u0448\u0435\u0434\u0448\u0438\u0445 (secInPassedDays) \u0435\u0441\u043B\u0438 \u043E\u043D\u043E \u043D\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0430\u0435\u0442 \u0441 \u0438\u0437\u043D\u0430\u0447\u0430\u043B\u044C\u043D\u043E \u0437\u0430\u0434\u0430\u043D\u043D\u044B\u043C\n      <p>Spent: 0</p>\n      <p>Saved: ' + this.initialLimit + '</p>\n      <p>Probably you did it wrong or didn&#39;t write down your purchases. Try again.</p>';
     } else if (this.currentLimit < 0) {
-      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>' + '<p>Period (days): ' + this.deadLinePeriod + '</p>' + '<p>Spent: ' + (this.initialLimit * this.deadLinePeriod + Math.abs(this.currentLimit)) + '</p>' + '<p>Overspent: ' + Math.abs(this.currentLimit) + '</p>' + '<p>Try again.</p>';
+      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>\n      <p>Period (days): ' + this.deadLinePeriod + '</p>\n      <p>Spent: ' + (this.initialLimit * this.deadLinePeriod + Math.abs(this.currentLimit)) + '</p>\n      <p>Overspent: ' + Math.abs(this.currentLimit) + '</p>\n      <p>Try again.</p>';
     } else {
-      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>' + '<p>Period (days): ' + this.deadLinePeriod + '</p>' + '<p>Spent: ' + (this.initialLimit * this.deadLinePeriod - this.currentLimit) + '</p>' + '<p>Saved: ' + this.currentLimit + '</p>' + '<p>Try again.</p>';
+      endStat.innerHTML = '<p>Day limit: ' + this.initialLimit + '</p>\n      <p>Period (days): ' + this.deadLinePeriod + '</p>\n      <p>Spent: ' + (this.initialLimit * this.deadLinePeriod - this.currentLimit) + '</p>\n      <p>Saved: ' + this.currentLimit + '</p>\n      <p>Try again.</p>';
     }
   },
 
@@ -422,7 +421,7 @@ var simpl = {
     this.messageHide = setTimeout(function () {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = expandTime || 5000);
+    }.bind(this), expandTime = 5000);
   },
 
   // messages object

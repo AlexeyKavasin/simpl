@@ -226,7 +226,7 @@ var simpl = {
     this.clearPopUpFields();
     var endDiv = document.createElement('div');
     endDiv.classList.add('pop-up');
-    endDiv.innerHTML = '<div class="pop-up__wrapper">' + '<div id="end-verdict"></div>' + '<div id="end-stat"></div>' + '<div class="pop-up__controls">' + '<button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>' + '</div>' + '</div>';
+    endDiv.innerHTML = '<div class="pop-up__wrapper">\n      <div id="end-verdict"></div>\n      <div id="end-stat"></div>\n      <div class="pop-up__controls">\n        <button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>\n      </div>\n    </div>';
     this.workingSpace.appendChild(endDiv);
     this.workingSpace.classList.add('pop-up-visible');
     this.loadStat();
@@ -291,23 +291,23 @@ var simpl = {
     if (this.countdownIsOn) {
       // app in progress
       document.body.classList.add('in-process');
-      for (var i = 0; i < btns.length; i++) {
-        if (btns[i].classList.contains('init-load-btn')) {
-          btns[i].disabled = true;
+      btns.forEach(function (b) {
+        if (b.classList.contains('init-load-btn')) {
+          b.disabled = true;
         } else {
-          btns[i].disabled = false;
+          b.disabled = false;
         }
-      }
+      });
     } else {
       // app is stopped
       document.body.classList.remove('in-process');
-      for (i = 0; i < btns.length; i++) {
-        if (btns[i].classList.contains('in-process-btn')) {
-          btns[i].disabled = true;
+      btns.forEach(function (b) {
+        if (b.classList.contains('in-process-btn')) {
+          b.disabled = true;
         } else {
-          btns[i].disabled = false;
+          b.disabled = false;
         }
-      }
+      });
     }
   },
 
@@ -339,13 +339,13 @@ var simpl = {
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
     if (popUpType === 'setlimit-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">' + '<p class="pop-up__p">Set your day limit<br> 1 - 29999</p>' + '<div class="pop-up__field-wrapper">' + '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>' + '</div>' + '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' + '<div class="pop-up__field-wrapper custom-range">' + '<input type="range" id="deadline-range" min="1" max="7" step="1" value="1">' + '</div>' + '<div class="pop-up__field-wrapper">' + '<input type="text" class="pop-up__field" id="deadline-range-output" value="1">' + '</div>' + '<div class="pop-up__controls">' + '<button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>' + '<button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>' + '</div>' + '</div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>\n        </div>\n        <p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>\n        <div class="pop-up__field-wrapper custom-range">\n          <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">\n        </div>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" id="deadline-range-output" value="1">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>\n          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>\n        </div>\n      </div>';
     }
     if (popUpType === 'rest-confirm-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">' + '<p class="pop-up__p">Your progress will be lost. Continue?</p><br>' + '<div class="pop-up__controls">' + '<button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>' + '<button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>' + '</div>' + '</div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Your progress will be lost. Continue?</p><br>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>\n          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>\n        </div>\n      </div>';
     }
     if (popUpType === 'setexpense-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">' + '<p class="pop-up__p">Amount spent</p>' + '<div class="pop-up__field-wrapper">' + '<input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>' + '</div>' + '<p class="pop-up__p">Purchase description</p>' + '<div class="pop-up__field-wrapper">' + '<input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">' + '</div>' + '<div class="pop-up__controls">' + '<button type="button" class="btn" id="setexpense-submit">Ok</button>' + '<button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>' + '</div>' + '</div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Amount spent</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>\n        </div>\n        <p class="pop-up__p">Purchase description</p>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setexpense-submit">Ok</button>\n          <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>\n        </div>\n      </div>';
     }
     this.workingSpace.appendChild(popUpDiv);
     if (fn) {
@@ -356,9 +356,9 @@ var simpl = {
   // clearing pop-up fields
   clearPopUpFields: function clearPopUpFields() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
-    for (var i = 0; i < popUpFields.length; i++) {
-      popUpFields[i].value = '';
-    }
+    popUpFields.forEach(function (p) {
+      p.value = '';
+    });
   },
 
   // clearing adviser field
@@ -395,7 +395,7 @@ var simpl = {
         var rangeSlider = document.querySelector('#deadline-range');
         var rangeOutput = document.querySelector('#deadline-range-output');
         rangeSlider.addEventListener('input', function () {
-          rangeOutput.value = rangeSlider.value;
+          return rangeOutput.value = rangeSlider.value;
         });
       });
     } else {

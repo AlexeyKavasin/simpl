@@ -86,8 +86,8 @@ var simpl = {
         }
         this.countdownIsOn = false;
         this.cycleEnded = true;
-        this.endCycle();
         this.countdownContainer.style.display = '';
+        this.endCycle();
         return false;
       }
       if (this.deadLinePeriod * this.SEC_IN_DAY - now > parseInt(localStorage.secInPassedDays, 10) && now > 0) {
@@ -184,9 +184,9 @@ var simpl = {
       }).join('');
       var listItems = document.querySelectorAll('.expense-list__item');
       var defaultPadding = 12;
-      for (var i = 0; i < listItems.length; i++) {
-        listItems[i].style.paddingRight = listItems[i].children[0].offsetWidth + defaultPadding * 2 + 'px';
-      }
+      listItems.forEach(function (l) {
+        l.style.paddingRight = l.children[0].offsetWidth + defaultPadding * 2 + 'px';
+      });
     }
   },
 
@@ -258,7 +258,7 @@ var simpl = {
     localStorage.clear();
     var popUps = document.querySelectorAll('.pop-up');
     popUps.forEach(function (p) {
-      return p.style.display = '';
+      p.style.display = '';
     });
     this.secInPassedDays = 86400;
     this.checkColorIndicator();
@@ -328,6 +328,7 @@ var simpl = {
   // pop-up toggling
   togglePopUp: function togglePopUp(popUpType, fn) {
     this.clearPopUpFields();
+    var self = this;
     if (this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
       var contents = this.workingSpace.children;
@@ -373,7 +374,7 @@ var simpl = {
   clearPopUpFields: function clearPopUpFields() {
     var popUpFields = document.querySelectorAll('.pop-up__field');
     popUpFields.forEach(function (p) {
-      return p.value = '';
+      p.value = '';
     });
   },
 

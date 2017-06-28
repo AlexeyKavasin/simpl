@@ -27,6 +27,7 @@ var simpl = {
   addListeners: function addListeners() {
     var self = simpl;
     self.workingSpace.addEventListener('click', self.btnAction);
+    self.workingSpace.addEventListener('keypress', self.btnAction);
   },
 
 
@@ -235,7 +236,7 @@ var simpl = {
     this.clearPopUpFields();
     var endDiv = document.createElement('div');
     endDiv.classList.add('pop-up');
-    endDiv.innerHTML = '<div class="pop-up__wrapper">\n      <div id="end-verdict"></div>\n      <div id="end-stat"></div>\n      <div class="pop-up__controls">\n        <button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>\n      </div>\n    </div>';
+    endDiv.innerHTML = '<div class="pop-up__wrapper">\n      <div id="end-verdict"></div>\n      <div id="end-stat"></div>\n      <div class="pop-up__controls">\n        <button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up" data-submit="ok">Ok</button>\n      </div>\n    </div>';
     this.workingSpace.appendChild(endDiv);
     this.workingSpace.classList.add('pop-up-visible');
     this.loadStat();
@@ -355,13 +356,13 @@ var simpl = {
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
     if (popUpType === 'setlimit-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>\n        </div>\n        <p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>\n        <div class="pop-up__field-wrapper custom-range">\n          <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">\n        </div>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" id="deadline-range-output" value="1">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>\n          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>\n        </div>\n      </div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>\n        </div>\n        <p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>\n        <div class="pop-up__field-wrapper custom-range">\n          <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">\n        </div>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" id="deadline-range-output" value="1">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up" data-submit="cancel">Cancel</button>\n        </div>\n      </div>';
     }
     if (popUpType === 'rest-confirm-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Your progress will be lost. Continue?</p><br>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>\n          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>\n        </div>\n      </div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Your progress will be lost. Continue?</p><br>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up" data-submit="cancel">Cancel</button>\n        </div>\n      </div>';
     }
     if (popUpType === 'setexpense-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Amount spent</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>\n        </div>\n        <p class="pop-up__p">Purchase description</p>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setexpense-submit">Ok</button>\n          <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>\n        </div>\n      </div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Amount spent</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>\n        </div>\n        <p class="pop-up__p">Purchase description</p>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setexpense-submit" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up" data-submit="ok">Cancel</button>\n        </div>\n      </div>';
     }
     this.workingSpace.appendChild(popUpDiv);
     if (fn) {
@@ -398,6 +399,7 @@ var simpl = {
     if (!isBtn) {
       return;
     }
+    // clicks
     if (id === 'final-reset' || id === 'reset-confirm') {
       self.resetAll();
       self.togglePopUp(popUpType);

@@ -27,6 +27,7 @@ var simpl = {
   addListeners() {
     var self = simpl;
     self.workingSpace.addEventListener('click', self.btnAction);
+    self.workingSpace.addEventListener('keypress', self.btnAction);
   },
 
   // setting limit
@@ -231,7 +232,7 @@ var simpl = {
       <div id="end-verdict"></div>
       <div id="end-stat"></div>
       <div class="pop-up__controls">
-        <button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up">Ok</button>
+        <button type="button" class="btn" id="final-reset" data-pop-id="end-pop-up" data-submit="ok">Ok</button>
       </div>
     </div>`;
     this.workingSpace.appendChild(endDiv);
@@ -374,8 +375,8 @@ var simpl = {
           <input type="text" class="pop-up__field" id="deadline-range-output" value="1">
         </div>
         <div class="pop-up__controls">
-          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up">Ok</button>
-          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up">Cancel</button>
+          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up" data-submit="ok">Ok</button>
+          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up" data-submit="cancel">Cancel</button>
         </div>
       </div>`;
     }
@@ -384,8 +385,8 @@ var simpl = {
       `<div class="pop-up__wrapper">
         <p class="pop-up__p">Your progress will be lost. Continue?</p><br>
         <div class="pop-up__controls">
-          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up">Ok</button>
-          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up">Cancel</button>
+          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up" data-submit="ok">Ok</button>
+          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up" data-submit="cancel">Cancel</button>
         </div>
       </div>`;
     }
@@ -401,8 +402,8 @@ var simpl = {
           <input type="text" class="pop-up__field" maxlength="30" id="setexpense-name-field" value="">
         </div>
         <div class="pop-up__controls">
-          <button type="button" class="btn" id="setexpense-submit">Ok</button>
-          <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up">Cancel</button>
+          <button type="button" class="btn" id="setexpense-submit" data-submit="ok">Ok</button>
+          <button type="button" class="btn" id="setexpense-cancel" data-pop-id="setexpense-pop-up" data-submit="ok">Cancel</button>
         </div>
       </div>`;
     }
@@ -436,6 +437,7 @@ var simpl = {
     if(!isBtn) {
       return;
     }
+    // clicks
     if(id === 'final-reset' || id === 'reset-confirm') {
       self.resetAll();
       self.togglePopUp(popUpType);

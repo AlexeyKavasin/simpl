@@ -1,6 +1,6 @@
 'use strict';
 
-var simpl = {
+const simpl = {
   SEC_IN_DAY: 86400,
   secInPassedDays: 86400,
   countdownIsOn: this.countdownIsOn || false,
@@ -25,15 +25,43 @@ var simpl = {
 
   // adding listeners
   addListeners() {
-    var self = simpl;
-    self.workingSpace.addEventListener('click', self.btnAction);
-    self.workingSpace.addEventListener('keypress', self.btnAction);
+    window.addEventListener('click', function(evt) {
+      let id = evt.target.id;
+      let isBtn = evt.target.classList.contains('btn');
+      let popUpType = evt.target.dataset.popId;
+      if(!isBtn) {
+        return;
+      }
+      // clicks
+      if(id === 'final-reset' || id === 'reset-confirm') {
+        this.resetAll();
+        this.togglePopUp(popUpType);
+      } else if(id === 'setlimit-submit') {
+        this.setLimit();
+        this.togglePopUp(popUpType);
+      } else if(id === 'setexpense-submit') {
+        this.limitSubtract();
+        if(!this.cycleEnded) {
+          this.togglePopUp(popUpType);
+        }
+      } else if(id === 'set-limit-btn') {
+        this.togglePopUp(popUpType, function() {
+          let rangeSlider = document.querySelector('#deadline-range');
+          let rangeOutput = document.querySelector('#deadline-range-output');
+          rangeSlider.addEventListener('input', function() {
+            rangeOutput.value = rangeSlider.value  
+          });
+        });
+      } else {
+        this.togglePopUp(popUpType);
+      }
+    }.bind(this));
   },
 
   // setting limit
   setLimit() {
-    var setlimitField = document.querySelector('#setlimit-field');
-    var deadlineRange = document.querySelector('#deadline-range');
+    let setlimitField = document.querySelector('#setlimit-field');
+    let deadlineRange = document.querySelector('#deadline-range');
     this.cleanAdviser();
     this.initialLimit = parseInt(setlimitField.value, 10);
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
@@ -71,7 +99,7 @@ var simpl = {
     if(!this.countdownIsOn) {
       this.countdownContainer.innerHTML = '';
     } else {
-      var now = new Date();
+      let now = new Date();
       now = Math.floor((this.endDeadLine - now) / 1000);
       if(now <= 0) {
         // additional checking
@@ -95,17 +123,17 @@ var simpl = {
         this.secInPassedDays += this.SEC_IN_DAY;
         localStorage.setItem('secInPassedDays', this.secInPassedDays);
       }
-      var tsec = now % 60;
+      let tsec = now % 60;
       now = Math.floor(now / 60);
       if(tsec < 10) {
         tsec = '0' + tsec;
       }
-      var tmin = now % 60;
+      let tmin = now % 60;
       now = Math.floor(now / 60);
       if(tmin < 10) {
         tmin = '0' + tmin;
       }
-      var thour = now % (24 * this.deadLinePeriod);
+      let thour = now % (24 * this.deadLinePeriod);
       now = Math.floor(now / 24);
       if(thour < 10) {
         thour = '0' + thour;
@@ -120,15 +148,15 @@ var simpl = {
 
   // subtract
   limitSubtract() {
-    var setExpenseValueField = document.querySelector('#setexpense-value-field');
-    var setExpenseNameField = document.querySelector('#setexpense-name-field');
+    let setExpenseValueField = document.querySelector('#setexpense-value-field');
+    let setExpenseNameField = document.querySelector('#setexpense-name-field');
     this.expense = parseInt(setExpenseValueField.value, 10);
     if(Number.isInteger(this.expense) && this.expense > 0 && this.expense < 30000 && setExpenseNameField.value) {
       this.currentLimit = localStorage.currentLimit || this.initialLimit;
       this.currentLimit -= this.expense;
       localStorage.setItem('currentLimit', this.currentLimit);
       this.limitInputField.value = this.currentLimit;
-      var expenseObj = {
+      let expenseObj = {
         name: setExpenseNameField.value,
         price: this.expense
       };
@@ -151,7 +179,7 @@ var simpl = {
     if(localStorage.expenseItems) {
       this.expenseItems = JSON.parse(localStorage.expenseItems);
     }
-    var expenseItem = {
+    let expenseItem = {
       name: item.name,
       price: item.price
     };
@@ -166,20 +194,20 @@ var simpl = {
   // showing expense list
   showExpenseList() {
     this.cleanAdviser();
-    var isEmpty = true;
+    let isEmpty = true;
     if(localStorage.expenseItems) {
       this.expenseItems = JSON.parse(localStorage.expenseItems);
       isEmpty = false;
     }
     if(!isEmpty) {
-      var expenseList = document.createElement('ul');
+      let expenseList = document.createElement('ul');
       expenseList.classList.add('expense-list');
       this.adviserContainer.appendChild(expenseList);
       expenseList.innerHTML = this.expenseItems.map((i) => {
         return `<li class="expense-list__item">${i.name}<span class="expense-list__cash">${i.price}</span></li>`;
       }).join('');
-      var listItems = document.querySelectorAll('.expense-list__item');
-      var defaultPadding = 12;
+      let listItems = document.querySelectorAll('.expense-list__item');
+      let defaultPadding = 12;
       listItems.forEach((l) => {
         l.style.paddingRight = l.children[0].offsetWidth + (defaultPadding * 2) + 'px';
       })
@@ -190,7 +218,7 @@ var simpl = {
   init() {
     this.addListeners();
     this.controlsState();
-    if(localStorage.length) { // рабочее состояние - в локал сторож есть данные
+    if(localStorage.length) { // app is working - data in localstorage
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
       this.endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
       this.deadLinePeriod = localStorage.deadLinePeriod;
@@ -202,7 +230,7 @@ var simpl = {
       this.showExpenseList();
       this.limitInputField.value = this.currentLimit;
       clearTimeout(showTimer);
-      var showTimer = setTimeout(function() {
+      let showTimer = setTimeout(function() {
         this.countdownContainer.style.display = 'block';
       }.bind(this), 1000);
     }
@@ -225,7 +253,7 @@ var simpl = {
   // end of cycle
   endCycle() {
     this.clearPopUpFields();
-    var endDiv = document.createElement('div');
+    let endDiv = document.createElement('div');
     endDiv.classList.add('pop-up');
     endDiv.innerHTML =
     `<div class="pop-up__wrapper">
@@ -254,7 +282,7 @@ var simpl = {
     this.expenseItems = [];
     this.limitInputField.value = '';
     localStorage.clear();
-    var popUps = document.querySelectorAll('.pop-up');
+    let popUps = document.querySelectorAll('.pop-up');
     popUps.forEach((p) => { p.style.display = '' });
     this.secInPassedDays = 86400;
     this.checkColorIndicator();
@@ -262,8 +290,8 @@ var simpl = {
 
   // loading stats
   loadStat() {
-    var endVerdict = document.querySelector('#end-verdict');
-    var endStat = document.querySelector('#end-stat');
+    let endVerdict = document.querySelector('#end-verdict');
+    let endStat = document.querySelector('#end-stat');
     this.initialLimit = parseInt(localStorage.initialLimit, 10);
     this.currentLimit = parseInt(localStorage.currentLimit, 10);
     this.deadLinePeriod = parseInt(localStorage.deadLinePeriod, 10);
@@ -308,7 +336,7 @@ var simpl = {
 
   // state of buttons - active / inactive
   controlsState() {
-    var btns = document.querySelectorAll('.btn');
+    let btns = document.querySelectorAll('.btn');
     if(this.countdownIsOn) {
       // app in progress
       document.body.classList.add('in-process');
@@ -335,10 +363,9 @@ var simpl = {
   // pop-up toggling
   togglePopUp(popUpType, fn) {
     this.clearPopUpFields();
-    var self = this;
     if(this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
-      var contents = this.workingSpace.children;
+      let contents = this.workingSpace.children;
       if(contents.length) {
         for(let i = 0; i < contents.length; i++) {
           if(contents[i].classList.contains('pop-up')) {
@@ -357,7 +384,7 @@ var simpl = {
 
   // pop-up filling with content
   fillPopUp(popUpType, fn) {
-    var popUpDiv = document.createElement('div');
+    let popUpDiv = document.createElement('div');
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
     if(popUpType === 'setlimit-pop-up') {
@@ -372,7 +399,7 @@ var simpl = {
           <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">
         </div>
         <div class="pop-up__field-wrapper">
-          <input type="text" class="pop-up__field" id="deadline-range-output" value="1">
+          <input type="text" class="pop-up__field" id="deadline-range-output" value="1" readonly>
         </div>
         <div class="pop-up__controls">
           <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up" data-submit="ok">Ok</button>
@@ -415,7 +442,7 @@ var simpl = {
 
   // clearing pop-up fields
   clearPopUpFields() {
-    var popUpFields = document.querySelectorAll('.pop-up__field');
+    let popUpFields = document.querySelectorAll('.pop-up__field');
     popUpFields.forEach((p) => { p.value = '' });
   },
 
@@ -426,40 +453,6 @@ var simpl = {
     this.adviserContainer.innerHTML = '';
     this.adviserContainer.className = '';
     this.adviserContainer.classList.add('adviser__wrapper');
-  },
-
-  // actions for control elements
-  btnAction(evt) {
-    var self = simpl;
-    var id = evt.target.id;
-    var isBtn = evt.target.classList.contains('btn');
-    var popUpType = evt.target.dataset.popId;
-    if(!isBtn) {
-      return;
-    }
-    // clicks
-    if(id === 'final-reset' || id === 'reset-confirm') {
-      self.resetAll();
-      self.togglePopUp(popUpType);
-    } else if(id === 'setlimit-submit') {
-      self.setLimit();
-      self.togglePopUp(popUpType);
-    } else if(id === 'setexpense-submit') {
-      self.limitSubtract();
-      if(!this.cycleEnded) {
-        self.togglePopUp(popUpType);
-      }
-    } else if(id === 'set-limit-btn') {
-      self.togglePopUp(popUpType, function() {
-        var rangeSlider = document.querySelector('#deadline-range');
-        var rangeOutput = document.querySelector('#deadline-range-output');
-        rangeSlider.addEventListener('input', function() {
-          rangeOutput.value = rangeSlider.value  
-        });
-      });
-    } else {
-      self.togglePopUp(popUpType);
-    }
   },
 
   // showing system messages
@@ -476,11 +469,11 @@ var simpl = {
         this.adviserContainer.innerHTML += blinkingCursor;
         this.adviserContainer.classList.add(messageType);
       }
-    }.bind(this), speed); // магическое число
+    }.bind(this), speed);
     this.messageHide = setTimeout(function() {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = 5000);
+    }.bind(this), expandTime = 8000);
   },
 
   // messages object

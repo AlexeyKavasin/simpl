@@ -25,9 +25,37 @@ var simpl = {
 
   // adding listeners
   addListeners: function addListeners() {
-    var self = simpl;
-    self.workingSpace.addEventListener('click', self.btnAction);
-    self.workingSpace.addEventListener('keypress', self.btnAction);
+    window.addEventListener('click', function (evt) {
+      var id = evt.target.id;
+      var isBtn = evt.target.classList.contains('btn');
+      var popUpType = evt.target.dataset.popId;
+      if (!isBtn) {
+        return;
+      }
+      // clicks
+      if (id === 'final-reset' || id === 'reset-confirm') {
+        this.resetAll();
+        this.togglePopUp(popUpType);
+      } else if (id === 'setlimit-submit') {
+        this.setLimit();
+        this.togglePopUp(popUpType);
+      } else if (id === 'setexpense-submit') {
+        this.limitSubtract();
+        if (!this.cycleEnded) {
+          this.togglePopUp(popUpType);
+        }
+      } else if (id === 'set-limit-btn') {
+        this.togglePopUp(popUpType, function () {
+          var rangeSlider = document.querySelector('#deadline-range');
+          var rangeOutput = document.querySelector('#deadline-range-output');
+          rangeSlider.addEventListener('input', function () {
+            rangeOutput.value = rangeSlider.value;
+          });
+        });
+      } else {
+        this.togglePopUp(popUpType);
+      }
+    }.bind(this));
   },
 
 
@@ -197,7 +225,7 @@ var simpl = {
     this.addListeners();
     this.controlsState();
     if (localStorage.length) {
-      // рабочее состояние - в локал сторож есть данные
+      // app is working - data in localstorage
       this.startDeadLine = new Date(Date.parse(localStorage.startDeadLine));
       this.endDeadLine = new Date(Date.parse(localStorage.endDeadLine));
       this.deadLinePeriod = localStorage.deadLinePeriod;
@@ -329,7 +357,6 @@ var simpl = {
   // pop-up toggling
   togglePopUp: function togglePopUp(popUpType, fn) {
     this.clearPopUpFields();
-    var self = this;
     if (this.workingSpace.classList.contains('pop-up-visible')) {
       this.workingSpace.classList.remove('pop-up-visible');
       var contents = this.workingSpace.children;
@@ -356,7 +383,7 @@ var simpl = {
     popUpDiv.classList.add('pop-up');
     popUpDiv.id = popUpType;
     if (popUpType === 'setlimit-pop-up') {
-      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>\n        </div>\n        <p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>\n        <div class="pop-up__field-wrapper custom-range">\n          <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">\n        </div>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" id="deadline-range-output" value="1">\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up" data-submit="cancel">Cancel</button>\n        </div>\n      </div>';
+      popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Set your day limit<br> 1 - 29999</p>\n        <div class="pop-up__field-wrapper">\n          <input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>\n        </div>\n        <p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>\n        <div class="pop-up__field-wrapper custom-range">\n          <input type="range" id="deadline-range" min="1" max="7" step="1" value="1">\n        </div>\n        <div class="pop-up__field-wrapper">\n          <input type="text" class="pop-up__field" id="deadline-range-output" value="1" readonly>\n        </div>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="setlimit-submit" data-pop-id="setlimit-pop-up" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="setlimit-cancel" data-pop-id="setlimit-pop-up" data-submit="cancel">Cancel</button>\n        </div>\n      </div>';
     }
     if (popUpType === 'rest-confirm-pop-up') {
       popUpDiv.innerHTML = '<div class="pop-up__wrapper">\n        <p class="pop-up__p">Your progress will be lost. Continue?</p><br>\n        <div class="pop-up__controls">\n          <button type="button" class="btn" id="reset-confirm" data-pop-id="rest-confirm-pop-up" data-submit="ok">Ok</button>\n          <button type="button" class="btn" id="reset-cancel" data-pop-id="rest-confirm-pop-up" data-submit="cancel">Cancel</button>\n        </div>\n      </div>';
@@ -390,41 +417,6 @@ var simpl = {
   },
 
 
-  // actions for control elements
-  btnAction: function btnAction(evt) {
-    var self = simpl;
-    var id = evt.target.id;
-    var isBtn = evt.target.classList.contains('btn');
-    var popUpType = evt.target.dataset.popId;
-    if (!isBtn) {
-      return;
-    }
-    // clicks
-    if (id === 'final-reset' || id === 'reset-confirm') {
-      self.resetAll();
-      self.togglePopUp(popUpType);
-    } else if (id === 'setlimit-submit') {
-      self.setLimit();
-      self.togglePopUp(popUpType);
-    } else if (id === 'setexpense-submit') {
-      self.limitSubtract();
-      if (!this.cycleEnded) {
-        self.togglePopUp(popUpType);
-      }
-    } else if (id === 'set-limit-btn') {
-      self.togglePopUp(popUpType, function () {
-        var rangeSlider = document.querySelector('#deadline-range');
-        var rangeOutput = document.querySelector('#deadline-range-output');
-        rangeSlider.addEventListener('input', function () {
-          rangeOutput.value = rangeSlider.value;
-        });
-      });
-    } else {
-      self.togglePopUp(popUpType);
-    }
-  },
-
-
   // showing system messages
   showSystemMessage: function showSystemMessage(systemMessageText, messageType, expandTime) {
     var i = 0;
@@ -439,11 +431,11 @@ var simpl = {
         this.adviserContainer.innerHTML += blinkingCursor;
         this.adviserContainer.classList.add(messageType);
       }
-    }.bind(this), speed); // магическое число
+    }.bind(this), speed);
     this.messageHide = setTimeout(function () {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = 5000);
+    }.bind(this), expandTime = 8000);
   },
 
 

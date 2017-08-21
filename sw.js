@@ -5,11 +5,11 @@ self.addEventListener('install', e => {
   caches.open('my-pwa-cache').then(cache => {
   // add all URLs of resources we want to cache
     return cache.addAll([
-      'simpl/',
-      'simpl/index.html',
-      'simpl/img/pepe.png',
-      'simpl/css/main.min.css',
-      'simpl/js/main.min.js',
+      '/',
+      '/index.html',
+      '/img/pepe.png',
+      '/css/main.min.css',
+      '/js/main.min.js',
     ]);
    })
  );

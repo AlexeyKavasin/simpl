@@ -2,6 +2,7 @@
   "lang": "en",
   "dir": "ltr",
   "name": "simpl",
+  "short_name": "simpl",
   "icons": [
     {
       "src": "android-chrome-192x192.png",

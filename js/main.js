@@ -476,17 +476,6 @@ const simpl = {
     }.bind(this), expandTime = 8000);
   },
 
-  registerServiceWorker() {
-  // register sw script in supporting browsers
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js', { scope: '.' }).then(() => {
-        console.log('Service Worker registered successfully.');
-      }).catch(error => {
-        console.log('Service Worker registration failed:', error);
-      });
-    }
-  },
-
   // messages object
   systemMessages: {
     expenseErrorTxt: 'Invalid value. Valid purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
@@ -499,4 +488,3 @@ const simpl = {
 };
 
 simpl.init();
-simpl.registerServiceWorker();

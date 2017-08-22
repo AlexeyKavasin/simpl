@@ -437,16 +437,6 @@ var simpl = {
       this.showExpenseList();
     }.bind(this), expandTime = 8000);
   },
-  registerServiceWorker: function registerServiceWorker() {
-    // register sw script in supporting browsers
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', { scope: '.' }).then(function () {
-        console.log('Service Worker registered successfully.');
-      }).catch(function (error) {
-        console.log('Service Worker registration failed:', error);
-      });
-    }
-  },
 
 
   // messages object
@@ -461,4 +451,3 @@ var simpl = {
 };
 
 simpl.init();
-simpl.registerServiceWorker();

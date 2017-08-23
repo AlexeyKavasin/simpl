@@ -87,6 +87,7 @@ gulp.task('serve', function() {
 
   gulp.watch('sass/**/*.{scss,sass}', ['style']);
   gulp.watch('*.html').on('change', server.reload);
+  gulp.watch('js/main.js', ['babelify', 'compress']);
   gulp.watch('js/main.js').on('change', server.reload);
 });
 

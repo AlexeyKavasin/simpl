@@ -7,6 +7,7 @@ this.addEventListener('install', function(e) {
       return cache.addAll([
         'index.html',
         'manifest.json',
+        'css/main.css',
         'css/main.min.css',
         'js/main.js',
         'js/main.transp.js',

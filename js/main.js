@@ -65,7 +65,7 @@ const simpl = {
     this.cleanAdviser();
     this.initialLimit = parseInt(setlimitField.value, 10);
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
-    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
+    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit <= 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
       return false;
     }

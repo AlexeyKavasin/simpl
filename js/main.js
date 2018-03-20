@@ -1,5 +1,60 @@
 'use strict';
 
+// (function() {
+//   const SEC_IN_DAY = 86400;
+//   const secInPassedDays = 86400;
+//   const workingSpace = document.querySelector('#main');
+//   const adviserContainer = document.querySelector('#adviser-content-wrapper');
+//   const countdownContainer = document.querySelector('#countdown');
+//   const limitInputField = document.querySelector('#limit-field');
+//   function Simpl() {
+//     let expense = 0;
+//     let countdownIsOn = this.countdownIsOn || false;
+//     let cycleEnded = this.cycleEnded || false;
+//     let initialLimit = localStorage.initialLimit || this.initialLimit || '';
+//     let currentLimit = localStorage.currentLimit || this.currentLimit || '';
+//     let currentSpent = localStorage.currentSpent || this.currentSpent || '';
+//     let startDeadLine = localStorage.startDeadLine || this.startDeadLine || '';
+//     let deadLinePeriod = localStorage.deadLinePeriod || this.deadLinePeriod || '';
+//     let endDeadLine = localStorage.endDeadLine || this.endDeadLine || '';
+//     let expenseItems = localStorage.expenseItems || this.expenseItems || [];
+//     let messageHide = this.messageHide || '';
+//     let animateAdvise = this.animateAdvise || '';
+//   }
+//   window.addEventListener('click', function(evt) {
+//     let id = evt.target.id;
+//     let isBtn = evt.target.classList.contains('btn');
+//     let popUpType = evt.target.dataset.popId;
+//     if(!isBtn) {
+//       return;
+//     }
+//     // clicks
+//     if(id === 'final-reset' || id === 'reset-confirm') {
+//       Simpl.resetAll();
+//       Simpl.togglePopUp(popUpType);
+//     } else if(id === 'setlimit-submit') {
+//       Simpl.setLimit();
+//       Simpl.togglePopUp(popUpType);
+//     } else if(id === 'setexpense-submit') {
+//       Simpl.limitSubtract();
+//       if(!Simpl.cycleEnded) {
+//         Simpl.togglePopUp(popUpType);
+//       }
+//     } else if(id === 'set-limit-btn') {
+//       Simpl.togglePopUp(popUpType, function() {
+//         let rangeSlider = document.querySelector('#deadline-range');
+//         let rangeOutput = document.querySelector('#deadline-range-output');
+//         rangeSlider.addEventListener('input', function() {
+//           rangeOutput.value = rangeSlider.value;
+//         });
+//       });
+//     } else {
+//       Simpl.togglePopUp(popUpType);
+//     }
+//   }.bind(Simpl));
+//   return new Simpl();
+// })()
+
 const simpl = {
   SEC_IN_DAY: 86400,
   secInPassedDays: 86400,

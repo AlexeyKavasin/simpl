@@ -8,6 +8,7 @@ var simpl = {
   expense: 0,
   initialLimit: localStorage.initialLimit || this.initialLimit || '',
   currentLimit: localStorage.currentLimit || this.currentLimit || '',
+  currentSpent: localStorage.currentSpent || this.currentSpent || '',
   startDeadLine: localStorage.startDeadLine || this.startDeadLine || '',
   deadLinePeriod: localStorage.deadLinePeriod || this.deadLinePeriod || '',
   endDeadLine: localStorage.endDeadLine || this.endDeadLine || '',
@@ -165,6 +166,7 @@ var simpl = {
       };
       this.addExpenseItem(expenseObj);
       this.checkColorIndicator();
+      this.showCurrentSpent(this.expense);
       if (this.currentLimit < -30000) {
         this.countdownIsOn = false;
         this.cycleEnded = true;
@@ -216,6 +218,23 @@ var simpl = {
       listItems.forEach(function (l) {
         l.style.paddingRight = l.children[0].offsetWidth + defaultPadding * 2 + 'px';
       });
+    }
+  },
+
+
+  // show spent sum
+  showCurrentSpent: function showCurrentSpent(currentSpent) {
+    var sum = +localStorage.currentSpent || 0;
+    sum += currentSpent;
+    var currSpentContainer = void 0;
+    if (currSpentContainer) {
+      currSpentContainer.innerHTML = '\u041F\u043E\u0442\u0440\u0430\u0447\u0435\u043D\u043E \u0437\u0430 \u0434\u0435\u043D\u044C: ' + sum;
+    } else {
+      currSpentContainer = document.createElement('div');
+      currSpentContainer.id = 'spent';
+      currSpentContainer.innerHTML = '\u041F\u043E\u0442\u0440\u0430\u0447\u0435\u043D\u043E \u0437\u0430 \u0434\u0435\u043D\u044C: ' + sum;
+      document.querySelector('.container--main').appendChild(currSpentContainer);
+      localStorage.setItem('currentSpent', sum);
     }
   },
 
@@ -418,7 +437,7 @@ var simpl = {
 
 
   // showing system messages
-  showSystemMessage: function showSystemMessage(systemMessageText, messageType, expandTime) {
+  showSystemMessage: function showSystemMessage(systemMessageText, messageType) {
     var i = 0;
     var blinkingCursor = '<span class="blinking-cursor">&nbsp;</span>';
     var speed = 30;
@@ -435,7 +454,7 @@ var simpl = {
     this.messageHide = setTimeout(function () {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = 8000);
+    }.bind(this), 8000);
   },
 
 
@@ -451,3 +470,5 @@ var simpl = {
 };
 
 simpl.init();
+
+//

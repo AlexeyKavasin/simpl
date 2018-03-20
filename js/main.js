@@ -8,6 +8,7 @@ const simpl = {
   expense: 0,
   initialLimit: localStorage.initialLimit || this.initialLimit || '',
   currentLimit: localStorage.currentLimit || this.currentLimit || '',
+  currentSpent: localStorage.currentSpent || this.currentSpent || '',
   startDeadLine: localStorage.startDeadLine || this.startDeadLine || '',
   deadLinePeriod: localStorage.deadLinePeriod || this.deadLinePeriod || '',
   endDeadLine: localStorage.endDeadLine || this.endDeadLine || '',
@@ -49,7 +50,7 @@ const simpl = {
           let rangeSlider = document.querySelector('#deadline-range');
           let rangeOutput = document.querySelector('#deadline-range-output');
           rangeSlider.addEventListener('input', function() {
-            rangeOutput.value = rangeSlider.value  
+            rangeOutput.value = rangeSlider.value;
           });
         });
       } else {
@@ -162,6 +163,7 @@ const simpl = {
       };
       this.addExpenseItem(expenseObj);
       this.checkColorIndicator();
+      this.showCurrentSpent(this.expense);
       if(this.currentLimit < -30000) {
         this.countdownIsOn = false;
         this.cycleEnded = true;
@@ -210,7 +212,23 @@ const simpl = {
       let defaultPadding = 12;
       listItems.forEach((l) => {
         l.style.paddingRight = l.children[0].offsetWidth + (defaultPadding * 2) + 'px';
-      })
+      });
+    }
+  },
+
+  // show spent sum
+  showCurrentSpent(currentSpent) {
+    let sum = +localStorage.currentSpent || 0;
+    sum += currentSpent;
+    let currSpentContainer;
+    if(currSpentContainer) {
+      currSpentContainer.innerHTML = `Потрачено за день: ${sum}`;
+    } else {
+      currSpentContainer = document.createElement('div');
+      currSpentContainer.id = 'spent';
+      currSpentContainer.innerHTML = `Потрачено за день: ${sum}`;
+      document.querySelector('.container--main').appendChild(currSpentContainer);
+      localStorage.setItem('currentSpent', sum);
     }
   },
 
@@ -283,7 +301,9 @@ const simpl = {
     this.limitInputField.value = '';
     localStorage.clear();
     let popUps = document.querySelectorAll('.pop-up');
-    popUps.forEach((p) => { p.style.display = '' });
+    popUps.forEach((p) => {
+      p.style.display = '';
+    });
     this.secInPassedDays = 86400;
     this.checkColorIndicator();
   },
@@ -346,7 +366,7 @@ const simpl = {
         } else {
           b.disabled = false;
         }
-      })
+      });
     } else {
       // app is stopped
       document.body.classList.remove('in-process');
@@ -356,7 +376,7 @@ const simpl = {
         } else {
           b.disabled = false;
         }
-      })
+      });
     }
   },
 
@@ -443,7 +463,9 @@ const simpl = {
   // clearing pop-up fields
   clearPopUpFields() {
     let popUpFields = document.querySelectorAll('.pop-up__field');
-    popUpFields.forEach((p) => { p.value = '' });
+    popUpFields.forEach((p) => {
+      p.value = '';
+    });
   },
 
   // clearing adviser field
@@ -456,7 +478,7 @@ const simpl = {
   },
 
   // showing system messages
-  showSystemMessage(systemMessageText, messageType, expandTime) {
+  showSystemMessage(systemMessageText, messageType) {
     let i = 0;
     let blinkingCursor = `<span class="blinking-cursor">&nbsp;</span>`;
     let speed = 30;
@@ -473,7 +495,7 @@ const simpl = {
     this.messageHide = setTimeout(function() {
       this.cleanAdviser();
       this.showExpenseList();
-    }.bind(this), expandTime = 8000);
+    }.bind(this), 8000);
   },
 
   // messages object
@@ -488,3 +510,5 @@ const simpl = {
 };
 
 simpl.init();
+
+//

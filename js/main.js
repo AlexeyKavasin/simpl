@@ -36,7 +36,7 @@ var simpl = {
     this.cleanAdviser();
     this.initialLimit = parseInt(setlimitField.value, 10);
     this.deadLinePeriod = parseInt(deadlineRange.value, 10);
-    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 29999) {
+    if(this.deadLinePeriod < 1 || this.deadLinePeriod > 7 || this.initialLimit < 0 || isNaN(this.initialLimit) || this.initialLimit > 100000) {
       this.showSystemMessage(this.systemMessages.limitErrorTxt, this.systemMessages.messageType['error'], 10000);
       return 'Invalid value';
     }
@@ -363,9 +363,9 @@ var simpl = {
     if(popUpType === 'setlimit-pop-up') {
       popUpDiv.innerHTML =
       '<div class="pop-up__wrapper">' +
-        '<p class="pop-up__p">Set your day limit<br> 1 - 29999</p>' +
+        '<p class="pop-up__p">Set your day limit<br> 1 - 100000</p>' +
         '<div class="pop-up__field-wrapper">' +
-          '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="29999" step="1" autofocus>' +
+          '<input type="number" class="pop-up__field" id="setlimit-field" min="1" max="100000" step="1" autofocus>' +
         '</div>' +
         '<p class="pop-up__p">Set a period<br> 1 - 7 (days)</p>' +
         '<div class="pop-up__field-wrapper custom-range">' +
@@ -395,7 +395,7 @@ var simpl = {
       '<div class="pop-up__wrapper">' +
         '<p class="pop-up__p">Amount spent</p>' +
         '<div class="pop-up__field-wrapper">' +
-          '<input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="29999" step="1" value="" autofocus>' +
+          '<input type="number" class="pop-up__field" id="setexpense-value-field" min="1" max="100000" step="1" value="" autofocus>' +
         '</div>' +
         '<p class="pop-up__p">Purchase description</p>' +
         '<div class="pop-up__field-wrapper">' +
@@ -486,8 +486,8 @@ var simpl = {
 
   // messages object
   systemMessages: {
-    expenseErrorTxt: 'Invalid value. Valid purchase amount is from 1 to 29999, purchase description field can\'t be empty ',
-    limitErrorTxt: 'Invalid value. Valid limit: 1 to 29999. Valid period: 1 - 7 days ',
+    expenseErrorTxt: 'Invalid value. Valid purchase amount is from 1 to 100000, purchase description field can\'t be empty ',
+    limitErrorTxt: 'Invalid value. Valid limit: 1 to 100000. Valid period: 1 - 7 days ',
     messageType: {
       error: 'error-message-open',
       regular: 'regular-message-open'
